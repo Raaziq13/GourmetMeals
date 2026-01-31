@@ -12,11 +12,10 @@
             --dark: #222;
             --light: #f9f9f9;
             --accent: #e67e22; /* Orange for Catering */
-            --info-bg: #e3f2fd;
-            --closed: #95a5a6; /* Grey for closed items */
+            --closed: #95a5a6; /* Grey for locked days */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica', sans-serif; }
-        body { background: var(--light); color: var(--dark); padding-bottom: 120px; }
+        body { background: var(--light); color: var(--dark); padding-bottom: 90px; }
         
         /* HEADER */
         header { background: white; padding: 15px 20px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
@@ -25,73 +24,51 @@
         .cart-icon { font-size: 1.2rem; cursor: pointer; position: relative; }
         .badge { position: absolute; top: -8px; right: -8px; background: var(--primary); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; }
 
-        /* TABS (FIXED SPACING) */
-        .tabs { 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; /* Space between buttons */
-            padding: 15px 10px; 
-            background: white; 
-            margin-bottom: 20px; 
-            border-bottom: 1px solid #eee; 
-            flex-wrap: wrap; 
-        }
-        .tab-btn { 
-            padding: 10px 18px; 
-            border: 1px solid #ddd; 
-            border-radius: 25px; 
-            background: transparent; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 0.9rem; 
-            margin-bottom: 5px; /* Extra space if they wrap on small phones */
-            white-space: nowrap;
-        }
+        /* TABS */
+        .tabs { display: flex; justify-content: center; gap: 5px; padding: 15px 10px; background: white; margin-bottom: 20px; border-bottom: 1px solid #eee; flex-wrap: wrap;}
+        .tab-btn { padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px; background: transparent; cursor: pointer; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px;}
         .tab-btn.active { background: var(--dark); color: var(--primary); border-color: var(--dark); }
 
         /* MENU SECTIONS */
-        .container { max-width: 800px; margin: 0 auto; padding: 0 15px; }
-        
-        /* Tab Content Logic (Hidden unless active) */
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 15px; display: none; }
+        .container.active { display: block; }
         
         .day-header { font-size: 1.4rem; font-weight: 800; margin: 30px 0 10px; color: var(--primary); border-bottom: 2px solid #ddd; padding-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;}
         .section-intro { background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--accent); font-size: 0.9rem; }
         
         /* DAILY CARDS */
-        .meal-card { background: white; border-radius: 8px; padding: 10px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; position: relative; }
-        .meal-card.closed { border-left-color: var(--closed); opacity: 0.6; background: #f4f4f4; }
+        .meal-card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
         
-        .meal-thumb { width: 80px; height: 80px; border-radius: 5px; object-fit: cover; background: #eee; flex-shrink: 0; }
+        /* New Styles for Images & Locking */
+        .meal-card.closed { border-left-color: var(--closed); background-color: #f4f4f4; opacity: 0.7; }
+        .meal-thumb { width: 70px; height: 70px; border-radius: 5px; object-fit: cover; flex-shrink: 0; background: #eee; }
+        
         .meal-info { flex: 1; }
-        .meal-info h3 { font-size: 1rem; margin-bottom: 3px; font-weight: bold; }
-        .meal-info p { font-size: 0.8rem; color: #666; margin-bottom: 5px; font-style: italic; line-height: 1.2; }
-        .meal-price { color: var(--dark); font-weight: 900; font-size: 1rem; }
+        .meal-info h3 { font-size: 1rem; margin-bottom: 5px; font-weight: bold; }
+        .meal-info p { font-size: 0.85rem; color: #666; margin-bottom: 5px; font-style: italic; }
+        .meal-price { color: var(--dark); font-weight: 900; font-size: 1.1rem; }
         
-        /* BUTTONS */
-        .add-btn { background: var(--dark); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; white-space: nowrap; }
-        .add-btn:active { transform: scale(0.95); }
-        .add-btn.disabled { background: var(--closed); cursor: not-allowed; transform: none; }
-
-        .catering-btn { background: var(--accent); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; width: 100%; margin-top: 5px; }
-        
-        /* GRID CARDS */
+        /* GRID CARDS (Frozen & Catering) */
         .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         .grid-card { background: white; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #eee; display: flex; flex-direction: column; justify-content: space-between; }
         .grid-card img { width: 100%; height: 120px; object-fit: cover; border-radius: 5px; background: #eee; margin-bottom: 10px; }
         .grid-card h4 { font-size: 0.95rem; margin-bottom: 5px; }
         
-        /* INFO CARD (ALWAYS VISIBLE) */
-        .info-card { background: white; border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin: 30px auto; max-width: 800px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .info-card h4 { text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
-        .info-card p { margin-bottom: 8px; font-size: 0.9rem; color: #555; }
+        /* BUTTONS */
+        .add-btn { background: var(--dark); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; white-space: nowrap; }
+        .add-btn:active { transform: scale(0.95); }
+        .add-btn.disabled { background: var(--closed); cursor: not-allowed; transform: none; }
+        
+        .catering-btn { background: var(--accent); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; width: 100%; margin-top: 5px; }
+        
+        /* INFO CARD (New) */
+        .info-card { background: #e3f2fd; border: 1px solid #bbdefb; border-radius: 10px; padding: 20px; margin: 30px 0; text-align: center; }
+        .info-card h4 { color: var(--dark); margin-bottom: 10px; text-transform: uppercase; font-size: 0.9rem; }
 
-        /* FOOTER */
+        /* FOOTER / CHECKOUT */
         .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 999;}
         .checkout-btn { background: #25D366; color: white; padding: 12px 20px; border-radius: 30px; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .info-note { font-size: 0.8rem; color: #777; text-align: center; margin-top: 20px; margin-bottom: 40px; }
     </style>
 </head>
 <body>
@@ -110,31 +87,28 @@
         <button class="tab-btn" onclick="switchTab('catering')">Catering & Events</button>
     </div>
 
-    <div id="daily" class="container tab-content active">
+    <div id="daily" class="container active">
         </div>
 
-    <div id="frozen" class="container tab-content">
+    <div id="frozen" class="container">
         <h2 class="day-header">Frozen & Healthy Stash</h2>
-        <div class="grid-layout" id="frozen-list"></div>
+        <div class="grid-layout" id="frozen-list">
+            </div>
     </div>
 
-    <div id="catering" class="container tab-content">
+    <div id="catering" class="container">
         <h2 class="day-header">Our Full Portfolio</h2>
-        <div class="section-intro">Looking for a large order? These meals are available for <strong>groups of 20+ people</strong>.</div>
-        <div class="grid-layout" id="catering-list"></div>
+        <div class="section-intro">
+            Looking for a large order? These meals are available for <strong>groups of 20+ people</strong>. Add to cart to request a quote.
+        </div>
+        <div class="grid-layout" id="catering-list">
+            </div>
     </div>
     
-    <div class="container">
-        <div class="info-card">
-            <h4><i class="fas fa-clock"></i> Order Info</h4>
-            <p>Orders accepted up until <strong>10AM daily</strong>.</p>
-            <p>Place orders via WhatsApp or SMS:</p>
-            <p style="font-size: 1.1rem; font-weight: bold; color: var(--dark);">084 299 2881 / 076 878 9492</p>
-            <br>
-            <p style="border-top: 1px solid #eee; paddingTop: 10px;">
-                <em>Kindly Note: Delivery available at <strong>R7 per km</strong></em>
-            </p>
-        </div>
+    <div class="container active">
+        <p class="info-note">
+            <i class="fas fa-info-circle"></i> Delivery available at R7 per km.
+        </p>
     </div>
 
     <div class="bottom-bar">
@@ -145,17 +119,13 @@
     </div>
 
     <script>
+        // 1. YOUR WHATSAPP NUMBER
         const PHONE_NUMBER = "27842992881"; 
 
-        // --- SIMULATE DAY ---
-        // Change this to 'null' when you are ready to go live!
-        // Current: 4 (Thursday) -> Mon-Wed closed.
-        const SIMULATE_DAY = 4; 
-
+        // 2. DAILY MENU (Updated with Images)
         const weeklyMenu = [
             {
-                day: "Monday 26/1",
-                dayIndex: 1, 
+                day: "Monday",
                 options: [
                     { name: "Steak Stirfry", price: 80, desc: "Egg noodles & veg", img: "https://images.unsplash.com/photo-1543362906-ac1b48261626?w=150" },
                     { name: "Braised Steak", price: 80, desc: "Savoury veggie rice", img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=150" },
@@ -163,8 +133,7 @@
                 ]
             },
             {
-                day: "Tuesday 27/1",
-                dayIndex: 2,
+                day: "Tuesday",
                 options: [
                     { name: "Pumpkin Bredie", price: 80, desc: "Braised white rice", img: "https://images.unsplash.com/photo-1606101237061-236b3252a122?w=150" },
                     { name: "Meat Curry", price: 80, desc: "Potatoes & rice", img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=150" },
@@ -172,8 +141,7 @@
                 ]
             },
             {
-                day: "Wednesday 28/1",
-                dayIndex: 3,
+                day: "Wednesday",
                 options: [
                     { name: "BBQ Fried Chicken", price: 80, desc: "Veg Lasagna", img: "https://images.unsplash.com/photo-1626082927389-d10e16738dfc?w=150" },
                     { name: "Pepper Pot Chicken", price: 80, desc: "Veg Lasagna", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=150" },
@@ -181,8 +149,7 @@
                 ]
             },
             {
-                day: "Thursday 29/1",
-                dayIndex: 4,
+                day: "Thursday",
                 options: [
                     { name: "Chicken Alfredo", price: 80, desc: "Creamy pasta", img: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=150" },
                     { name: "Smoked Butter Chicken", price: 80, desc: "Basmati rice", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=150" },
@@ -191,6 +158,7 @@
             }
         ];
 
+        // 3. FROZEN / HEALTHY ITEMS
         const frozenMenu = [
             { name: "Low Carb Chicken (5 Pack)", price: 450, img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=200" },
             { name: "Frozen Beef Stew (1kg)", price: 150, img: "https://images.unsplash.com/photo-1603048297172-c92544798d5e?w=200" },
@@ -198,6 +166,7 @@
             { name: "Family Mac & Cheese", price: 180, img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200" }
         ];
 
+        // 4. CATERING / PORTFOLIO
         const cateringMenu = [
             { name: "Lamb Akni", img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=200" },
             { name: "Roast Leg of Lamb", img: "https://images.unsplash.com/photo-1603048297172-c92544798d5e?w=200" },
@@ -207,38 +176,63 @@
             { name: "Party Platters", img: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=200" }
         ];
 
-        // --- CORE FUNCTIONS ---
+        // ==========================================
+        //     STOP EDITING BELOW THIS LINE
+        // ==========================================
+
         let cart = [];
         let hasQuoteRequest = false;
 
-        const todayIndex = SIMULATE_DAY !== null ? SIMULATE_DAY : new Date().getDay();
+        // --- LOCKING LOGIC ---
+        // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+        // Change this variable to '4' to test Thursday locking immediately
+        const currentDay = new Date().getDay(); 
+        // const currentDay = 4; // UNCOMMENT TO SIMULATE THURSDAY
 
+        // Render Daily
         const dailyContainer = document.getElementById('daily');
-        weeklyMenu.forEach((dayPlan, dayIndex) => {
-            const isPast = todayIndex > dayPlan.dayIndex; 
-            const cardClass = isPast ? "meal-card closed" : "meal-card";
-            const btnClass = isPast ? "add-btn disabled" : "add-btn";
-            const btnText = isPast ? "Closed" : "ADD";
-            const clickAction = isPast ? "" : `onclick="addToCart('daily', ${dayIndex}, ${mealIndex})"`;
+        weeklyMenu.forEach((dayPlan, index) => {
+            const dayIndex = index + 1; // Mon=1, Tue=2...
+            
+            // Lock if today is greater than the meal day (e.g. Thu(4) > Mon(1))
+            const isLocked = currentDay > dayIndex;
+            
+            const cardClass = isLocked ? "meal-card closed" : "meal-card";
+            const btnClass = isLocked ? "add-btn disabled" : "add-btn";
+            const btnText = isLocked ? "Closed" : "ADD";
+            const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex})"`;
 
-            let html = `<h2 class="day-header" style="${isPast ? 'color:gray' : ''}">${dayPlan.day}</h2>`;
+            let html = `<h2 class="day-header" style="${isLocked ? 'color:gray':''}">${dayPlan.day}</h2>`;
             dayPlan.options.forEach((meal, mealIndex) => {
-                const clickAttr = isPast ? "" : `onclick="addToCart('daily', ${dayIndex}, ${mealIndex})"`;
+                // Re-define click attribute for inside loop
+                const mealClickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex})"`;
+                
                 html += `
                     <div class="${cardClass}">
-                        <img src="${meal.img}" class="meal-thumb" style="${isPast ? 'filter:grayscale(100%)' : ''}">
+                        <img src="${meal.img}" class="meal-thumb" style="${isLocked ? 'filter:grayscale(100%)':''}">
                         <div class="meal-info">
                             <h3>${meal.name}</h3>
                             <p>${meal.desc}</p>
-                            <span class="meal-price">${isPast ? '' : 'R ' + meal.price}</span>
+                            <span class="meal-price">${isLocked ? '' : 'R ' + meal.price}</span>
                         </div>
-                        <button class="${btnClass}" ${clickAttr}>${btnText}</button>
+                        <button class="${btnClass}" ${mealClickAttr}>${btnText}</button>
                     </div>
                 `;
             });
             dailyContainer.innerHTML += html;
         });
 
+        // Add ORDER INFO to bottom of Daily Menu
+        dailyContainer.innerHTML += `
+            <div class="info-card">
+                <h4><i class="fas fa-clock"></i> Order Info</h4>
+                <p>Orders accepted up until <strong>10AM daily</strong>.</p>
+                <p>Place orders via WhatsApp or SMS:</p>
+                <p style="font-weight:bold;">084 299 2881 / 076 878 9492</p>
+            </div>
+        `;
+
+        // Render Frozen
         const frozenContainer = document.getElementById('frozen-list');
         frozenMenu.forEach((item, index) => {
             frozenContainer.innerHTML += `
@@ -251,6 +245,7 @@
             `;
         });
 
+        // Render Catering
         const cateringContainer = document.getElementById('catering-list');
         cateringMenu.forEach((item, index) => {
             cateringContainer.innerHTML += `
@@ -263,7 +258,7 @@
         });
 
         function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(tabName).classList.add('active');
             event.target.classList.add('active');
@@ -283,9 +278,11 @@
                 item = { name: `[Bulk Inquiry] ${meal.name}`, price: 0, isQuote: true };
                 hasQuoteRequest = true;
             }
+            
             cart.push(item);
             updateTotal();
             
+            // Visual feedback
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = "Added";
@@ -296,17 +293,24 @@
         function updateTotal() {
             let total = 0;
             let quoteItems = 0;
+            
             cart.forEach(i => {
                 total += i.price;
                 if(i.isQuote) quoteItems++;
             });
+
             let displayString = `Total: R ${total}.00`;
-            if (quoteItems > 0) displayString += ` + Quote`;
+            if (quoteItems > 0) {
+                displayString += ` + Quote`;
+            }
+
             document.getElementById('total-display').innerText = displayString;
             document.getElementById('cart-count').innerText = cart.length;
         }
         
-        function scrollToBottom() { window.scrollTo(0,document.body.scrollHeight); }
+        function scrollToBottom() {
+             window.scrollTo(0,document.body.scrollHeight);
+        }
 
         function checkout() {
             if (cart.length === 0) {
@@ -315,6 +319,7 @@
             }
             let msg = "Hi Mealtoday, here is my order/inquiry:%0A%0A";
             
+            // Separate lists for neatness
             let standardItems = cart.filter(i => !i.isQuote);
             let quoteItems = cart.filter(i => i.isQuote);
 
@@ -338,6 +343,7 @@
             
             msg += `%0A*Current Total: R${total}.00*`;
             if (quoteItems.length > 0) msg += " (+ Catering Quote)";
+            
             msg += "%0A%0APlease send payment details and confirm delivery availability.";
             
             window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
