@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
+        /* --- THEME SETTINGS --- */
         :root {
             --primary: #d4af37; 
             --primary-dark: #b5952f;
@@ -34,6 +35,7 @@
 
         h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
 
+        /* --- HEADER & NAV --- */
         header { 
             background: rgba(255, 255, 255, 0.95); 
             backdrop-filter: blur(10px);
@@ -47,6 +49,7 @@
             align-items: center; 
         }
         
+        /* LOGO DESIGN */
         .brand-box { display: flex; align-items: center; gap: 10px; }
         .brand-icon { 
             width: 40px; height: 40px; 
@@ -76,6 +79,7 @@
             border: 2px solid white;
         }
 
+        /* --- HERO --- */
         .hero {
             background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1543353071-873f17a7a088?auto=format&fit=crop&w=800&q=80');
             background-size: cover;
@@ -88,6 +92,7 @@
         .hero h1 { font-size: 2rem; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
         .hero p { font-size: 0.9rem; font-weight: 300; opacity: 0.9; }
 
+        /* --- TABS --- */
         .tabs { 
             display: flex; justify-content: center; gap: 10px; 
             padding: 0 15px; margin-bottom: 25px; overflow-x: auto;
@@ -105,6 +110,7 @@
             transform: translateY(-2px);
         }
 
+        /* --- MENU CONTAINERS --- */
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; display: none; animation: fadeIn 0.4s ease; }
         .container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -114,6 +120,7 @@
             border-left: 5px solid var(--primary); padding-left: 15px; 
         }
 
+        /* --- CARDS --- */
         .meal-card { 
             background: white; border-radius: var(--radius); padding: 15px; 
             margin-bottom: 20px; box-shadow: var(--shadow); 
@@ -121,12 +128,13 @@
             border: 1px solid rgba(0,0,0,0.02);
         }
         .meal-card.closed { opacity: 0.5; filter: grayscale(100%); pointer-events: none; background: #f4f4f4; }
-        .meal-thumb { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; cursor: zoom-in; }
+        .meal-thumb { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
         .meal-info { flex: 1; }
         .meal-info h3 { font-size: 1.1rem; margin-bottom: 4px; color: var(--dark); }
         .meal-info p { font-size: 0.85rem; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
         .meal-price { color: var(--primary-dark); font-weight: 700; font-size: 1.1rem; }
         
+        /* SIDE OPTION STYLE */
         .side-label {
             display: flex; align-items: center; gap: 8px;
             font-size: 0.8rem; color: var(--gray);
@@ -134,6 +142,7 @@
             padding: 5px 10px; border-radius: 8px; cursor: pointer;
             border: 1px solid #eee;
         }
+        .side-label input { width: auto; margin: 0; }
 
         .add-btn { 
             background: var(--dark); color: white; border: none; 
@@ -143,14 +152,16 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
         .add-btn:hover { background: var(--primary); transform: rotate(90deg); }
+        .add-btn.disabled { background: #ccc; box-shadow: none; }
 
+        /* --- GRID --- */
         .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; }
         .grid-card { 
             background: white; padding: 10px; border-radius: var(--radius); 
             text-align: center; box-shadow: var(--shadow); 
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .grid-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; cursor: zoom-in; }
+        .grid-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; }
         .grid-card h4 { font-size: 1rem; margin-bottom: 5px; font-weight: 600; }
         .grid-card p { color: var(--primary-dark); font-weight: 700; margin-bottom: 10px; }
         .grid-card small { font-size: 0.8rem; color: #777; margin-bottom: 8px; display: block; }
@@ -159,13 +170,16 @@
             padding: 8px; border-radius: 8px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
         }
 
+        /* --- INFO BOX --- */
         .info-card { 
             background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); 
             border-radius: var(--radius); padding: 25px; 
             margin: 40px 0; text-align: center; 
             box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
         }
+        .info-card h4 { color: var(--primary-dark); letter-spacing: 1px; margin-bottom: 15px; }
 
+        /* --- BOTTOM BAR --- */
         .bottom-bar { 
             position: fixed; bottom: 0; left: 0; width: 100%; background: white; 
             padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); 
@@ -178,9 +192,10 @@
             display: flex; align-items: center; gap: 8px;
         }
 
+        /* --- MODAL --- */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
         .modal-content { 
-            background-color: white; width: 95%; max-width: 450px; 
+            background-color: white; width: 90%; max-width: 400px; 
             border-radius: 20px; padding: 25px; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.2); 
             max-height: 90vh; overflow-y: auto;
@@ -188,27 +203,36 @@
         }
         @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* LIGHTBOX */
-        .lightbox { display: none; position: fixed; z-index: 3000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); align-items: center; justify-content: center; cursor: zoom-out; }
-        .lightbox img { max-width: 90%; max-height: 80%; border-radius: 12px; box-shadow: 0 0 30px rgba(0,0,0,0.5); animation: zoomIn 0.3s ease; }
-        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* CART ITEMS WITH QUANTITY */
-        .cart-summary-box { background: var(--light); border-radius: 12px; padding: 10px; margin-bottom: 20px; }
-        .cart-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd; }
-        .cart-item:last-child { border-bottom: none; }
-        .qty-controls { display: flex; align-items: center; gap: 10px; background: white; padding: 5px 10px; border-radius: 20px; border: 1px solid #ddd; }
-        .qty-btn { cursor: pointer; color: var(--primary-dark); font-weight: bold; width: 25px; text-align: center; }
-        .qty-val { font-size: 0.9rem; font-weight: 600; min-width: 20px; text-align: center; }
+        .modal h3 { text-align: center; margin-bottom: 20px; color: var(--dark); font-size: 1.5rem; }
+        
+        .cart-summary-box { 
+            background: var(--light); border-radius: 12px; padding: 15px; 
+            max-height: 150px; overflow-y: auto; margin-bottom: 20px;
+        }
+        .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .remove-btn { color: #ff7675; cursor: pointer; padding: 5px; }
         
         .form-group { margin-bottom: 15px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 5px; display: block; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; font-size: 1rem; font-family: 'Poppins', sans-serif; }
+        .form-group input, .form-group select { 
+            width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 10px; 
+            font-size: 1rem; font-family: 'Poppins', sans-serif;
+        }
         
-        .dynamic-info-box { background: #e3f2fd; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 15px; display: none; border: 1px solid #90caf9; }
-        .pay-btn-link { display: block; width: 100%; text-align: center; background: #ee5253; color: white; padding: 10px; border-radius: 8px; margin-top: 10px; text-decoration: none; font-weight: bold; }
+        .dynamic-info-box {
+            background: #e3f2fd; padding: 15px; border-radius: 10px; 
+            font-size: 0.9rem; margin-bottom: 15px; display: none;
+            border: 1px solid #90caf9;
+        }
+        .pay-btn-link {
+            display: block; width: 100%; text-align: center; background: #ee5253; 
+            color: white; padding: 10px; border-radius: 8px; margin-top: 10px; 
+            text-decoration: none; font-weight: bold;
+        }
+
         .confirm-btn { width: 100%; background: var(--dark); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem; }
         .cancel-btn { width: 100%; background: transparent; color: var(--gray); padding: 10px; border: none; font-weight: 600; cursor: pointer; margin-top: 10px; }
+
     </style>
 </head>
 <body>
@@ -221,6 +245,7 @@
                 <small>Fresh & Home-Cooked</small>
             </div>
         </div>
+
         <div class="cart-icon" onclick="openCheckout()">
             <i class="fas fa-shopping-bag"></i>
             <span class="badge" id="cart-count">0</span>
@@ -241,23 +266,35 @@
         <button class="tab-btn" onclick="switchTab('catering')">Catering</button>
     </div>
 
-    <div id="daily" class="container active"></div>
+    <div id="daily" class="container active">
+        <div style="text-align:center; padding:40px; color:#999; font-style:italic;">Loading Menu...</div>
+    </div>
+
     <div id="frozen" class="container">
         <h2 class="day-header">Freezer Stash</h2>
         <div class="grid-layout" id="frozen-list"></div>
     </div>
+    
     <div id="savouries" class="container">
         <h2 class="day-header">Savouries (Bulk Packs)</h2>
+        <div style="text-align:center; margin-bottom:20px; color:#666; font-size:0.9rem;">
+            Packs of 50. Perfect for events or stocking up.
+        </div>
         <div class="grid-layout" id="savouries-list"></div>
     </div>
+
     <div id="catering" class="container">
         <h2 class="day-header">Catering Portfolio</h2>
+        <div style="text-align:center; margin-bottom:20px; color:#666;">
+            Looking for a large order? Ideal for groups of 20+ people.
+        </div>
         <div class="grid-layout" id="catering-list"></div>
     </div>
-
+    
     <div id="checkoutModal" class="modal">
         <div class="modal-content">
             <h3>Checkout</h3>
+            
             <div id="cartSummary" class="cart-summary-box"></div>
             <div id="modalTotal" style="text-align:right; font-weight:800; margin-bottom:15px; font-size:1.2rem;">Total: R0.00</div>
 
@@ -281,8 +318,10 @@
 
             <div id="collectionBox" class="dynamic-info-box">
                 <strong>📍 Collection Point:</strong><br>
-                98 Old Strandfontein Rd, Ottery, 7780<br>
-                <a href="https://maps.app.goo.gl/9yGk3yvR9n78u7yL8" target="_blank" style="color:#d4af37; font-weight:bold;">View on Map</a>
+                98 Old Strandfontein Rd,<br>Ottery, Cape Town, 7780<br><br>
+                <a href="https://goo.gl/maps/1" target="_blank" style="color:#d4af37; font-weight:bold;">
+                    <i class="fas fa-map-marker-alt"></i> View on Map
+                </a>
             </div>
 
             <div class="form-group">
@@ -296,12 +335,20 @@
 
             <div id="eftBox" class="dynamic-info-box">
                 <strong>🏦 Banking Details:</strong><br>
-                Nedbank | MR Nazeer T/a Mealtoday<br>
-                Acc: 1152674110 | Branch: 198765
+                Bank: Nedbank<br>
+                Acc Name: MR Nazeer T/a Mealtoday<br>
+                Acc No: 1152674110<br>
+                Branch: Lansdowne (198765)<br>
+                Type: Cheque Account<br>
+                <br>
+                <em>Please send POP to WhatsApp.</em>
             </div>
 
-            <div id="payfastBox" class="dynamic-info-box">
-                <a href="#" target="_blank" class="pay-btn-link">Pay Now <i class="fas fa-credit-card"></i></a>
+            <div id="payfastBox" class="dynamic-info-box" style="display:block;">
+                Click below to pay securely via PayFast:<br>
+                <a href="#" target="_blank" class="pay-btn-link">
+                    Pay Now <i class="fas fa-credit-card"></i>
+                </a>
             </div>
             
             <button class="confirm-btn" onclick="sendWhatsAppOrder()">Confirm & Send</button>
@@ -314,46 +361,73 @@
             <span style="font-size:0.8rem; color:gray;">Total</span>
             <span id="total-display" style="font-weight:800; font-size:1.2rem; color:var(--dark);">R 0.00</span>
         </div>
-        <div onclick="openCheckout()" class="checkout-btn">Checkout <i class="fas fa-arrow-right"></i></div>
+        <div onclick="openCheckout()" class="checkout-btn">
+            Checkout <i class="fas fa-arrow-right"></i>
+        </div>
     </div>
-
-    <div id="lightbox" class="lightbox" onclick="this.style.display='none'"><img id="lightbox-img"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
+        // CONFIGURATION
         const PHONE_NUMBER = "27842992881"; 
         const MENU_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSdr9Q5N2H5hzkR2a61fy2n0T6uDHeom-twanZI5m-tGvvahTcqw04zY28IbVQARa3fe1gJqqqR2nZz/pub?gid=0&single=true&output=csv";
         const ORDER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNnQtP6JdpJD3GHwF5gCN4KJAZVRu_kxOzJ2jKg5LkNPZVo0Q1o0Cb2NXFtT-hS0igIQ/exec";
 
+        // DATA STORAGE
         let cart = [];
-        let weeklyMenu = [];
+        let weeklyMenu = [
+            { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
+            { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
+        ];
         let frozenMenu = [];
         let savouriesMenu = [];
         let cateringMenu = [];
 
+        // INITIALIZATION
         function init() {
             Papa.parse(MENU_SHEET_URL, {
                 download: true, header: true,
-                complete: function(results) { processData(results.data); }
+                complete: function(results) { processData(results.data); },
+                error: function(err) { console.log("Error loading sheet:", err); }
             });
         }
 
+        // PROCESS DATA
         function processData(data) {
-            weeklyMenu = [{day:"Monday", options:[]},{day:"Tuesday", options:[]},{day:"Wednesday", options:[]},{day:"Thursday", options:[]}];
+            weeklyMenu = [
+                { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
+                { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
+            ];
             frozenMenu = []; savouriesMenu = []; cateringMenu = [];
 
             data.forEach(row => {
                 if(!row.Name) return;
+                
                 let price = row.Price ? parseInt(row.Price.toString().replace(/[^0-9]/g, '')) : 0;
                 let sidePrice = row.SidePrice ? parseInt(row.SidePrice.toString().replace(/[^0-9]/g, '')) : 0;
 
                 if (row.Type === "Daily") {
                     const dayObj = weeklyMenu.find(d => d.day.includes(row.Day));
-                    if (dayObj) dayObj.options.push({ name: row.Name, price, desc: row.Desc, img: row.ImageLink, sideName: row.SideName || null, sidePrice });
+                    if (dayObj) {
+                        dayObj.options.push({ 
+                            name: row.Name, 
+                            price: price, 
+                            desc: row.Desc, 
+                            img: row.ImageLink,
+                            sideName: row.SideName || null,
+                            sidePrice: sidePrice
+                        });
+                    }
                 } else if (row.Type === "Frozen") {
-                    frozenMenu.push({ name: row.Name, price, img: row.ImageLink });
+                    frozenMenu.push({ name: row.Name, price: price, img: row.ImageLink });
                 } else if (row.Type === "Savouries") {
-                    savouriesMenu.push({ name: row.Name, price, desc: row.Desc, img: row.ImageLink });
+                    // NEW SAVOURIES LOGIC
+                    savouriesMenu.push({ 
+                        name: row.Name, 
+                        price: price, 
+                        desc: row.Desc, 
+                        img: row.ImageLink 
+                    });
                 } else if (row.Type === "Catering") {
                     cateringMenu.push({ name: row.Name, img: row.ImageLink });
                 }
@@ -361,151 +435,338 @@
             renderApp();
         }
 
-        function openLightbox(src) {
-            const lb = document.getElementById('lightbox');
-            document.getElementById('lightbox-img').src = src;
-            lb.style.display = 'flex';
-        }
-
+        // RENDER APP
         function renderApp() {
             const now = new Date();
             const currentDay = now.getDay(); 
-            const currentHour = now.getHours();
+            const currentHour = now.getHours(); 
+            const currentMinute = now.getMinutes();
+
+            // WEEKEND LOGIC
+            let isNextWeek = (currentDay === 6 || currentDay === 0);
+
+            function getMenuDate(targetDayIndex) {
+                const d = new Date();
+                if (isNextWeek) {
+                    if (currentDay === 6) d.setDate(d.getDate() + 2);
+                    if (currentDay === 0) d.setDate(d.getDate() + 1);
+                } else {
+                    const day = d.getDay();
+                    const diff = d.getDate() - day + (day == 0 ? -6 : 1);
+                    d.setDate(diff); 
+                }
+                const targetDate = new Date(d);
+                targetDate.setDate(d.getDate() + (targetDayIndex - 1));
+                return targetDate.getDate() + "/" + (targetDate.getMonth() + 1);
+            }
 
             const dailyContainer = document.getElementById('daily');
             dailyContainer.innerHTML = "";
             
             weeklyMenu.forEach((dayPlan, index) => {
-                let isLocked = (currentDay > index + 1) || (currentDay === index + 1 && currentHour >= 10);
-                let html = `<h2 class="day-header" style="${isLocked?'color:#bbb':''}">${dayPlan.day}</h2>`;
+                const dayIndex = index + 1; 
+                const dateStr = getMenuDate(dayIndex);
                 
-                dayPlan.options.forEach((meal, mIdx) => {
-                    const sideId = `side-${index}-${mIdx}`;
-                    html += `
-                        <div class="meal-card ${isLocked?'closed':''}">
-                            <img src="${meal.img}" class="meal-thumb" onclick="openLightbox('${meal.img}')">
-                            <div class="meal-info">
-                                <h3>${meal.name}</h3>
-                                <p>${meal.desc}</p>
-                                <span class="meal-price">${isLocked?'Closed':'R '+meal.price}</span>
-                                ${meal.sideName ? `<label class="side-label"><input type="checkbox" id="${sideId}"> +${meal.sideName} (R${meal.sidePrice})</label>` : ''}
+                let isLocked = false;
+                if (isNextWeek) {
+                    isLocked = false; 
+                } else {
+                    if (currentDay > dayIndex) { isLocked = true; } 
+                    else if (currentDay === dayIndex) {
+                        if (currentHour > 10 || (currentHour === 10 && currentMinute >= 1)) { 
+                            isLocked = true; 
+                        }
+                    }
+                }
+
+                const cardClass = isLocked ? "meal-card closed" : "meal-card";
+                const btnIcon = isLocked ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-plus"></i>';
+                const btnClass = isLocked ? "add-btn disabled" : "add-btn";
+
+                let html = `<h2 class="day-header" style="${isLocked ? 'color:#bbb':''}">${dayPlan.day} <span style="font-size:0.8rem; opacity:0.6;">${dateStr}</span></h2>`;
+                
+                if (dayPlan.options.length > 0) {
+                    dayPlan.options.forEach((meal, mealIndex) => {
+                        const sideCheckId = `side-${index}-${mealIndex}`;
+                        const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex}, '${sideCheckId}')"`;
+                        const itemPrice = isLocked ? 'Closed' : 'R ' + meal.price;
+                        
+                        let sideHtml = "";
+                        if(meal.sideName) {
+                            sideHtml = `
+                                <label class="side-label" onclick="event.stopPropagation()">
+                                    <input type="checkbox" id="${sideCheckId}"> 
+                                    + ${meal.sideName} (R${meal.sidePrice})
+                                </label>
+                            `;
+                        }
+
+                        html += `
+                            <div class="${cardClass}">
+                                <img src="${meal.img}" class="meal-thumb">
+                                <div class="meal-info">
+                                    <h3>${meal.name}</h3>
+                                    <p>${meal.desc}</p>
+                                    <span class="meal-price">${itemPrice}</span>
+                                    ${sideHtml}
+                                </div>
+                                <button class="${btnClass}" ${clickAttr}>${btnIcon}</button>
                             </div>
-                            ${!isLocked ? `<button class="add-btn" onclick="addToCart('daily', ${index}, ${mIdx}, '${sideId}')"><i class="fas fa-plus"></i></button>` : ''}
-                        </div>`;
-                });
+                        `;
+                    });
+                } else {
+                    html += `<div style="padding:15px; color:#888; font-style:italic;">Menu not loaded yet...</div>`;
+                }
                 dailyContainer.innerHTML += html;
             });
 
-            const renderGrid = (list, containerId, type) => {
-                const container = document.getElementById(containerId);
-                container.innerHTML = "";
-                list.forEach((item, idx) => {
-                    container.innerHTML += `
-                        <div class="grid-card">
-                            <img src="${item.img}" onclick="openLightbox('${item.img}')">
-                            <h4>${item.name}</h4>
-                            <p>${item.price ? 'R '+item.price : ''}</p>
-                            <button class="grid-btn" onclick="addToCart('${type}', 0, ${idx})">${item.price?'Add to Cart':'Get Quote'}</button>
-                        </div>`;
-                });
-            };
-            renderGrid(frozenMenu, 'frozen-list', 'frozen');
-            renderGrid(savouriesMenu, 'savouries-list', 'savouries');
-            renderGrid(cateringMenu, 'catering-list', 'catering');
+            dailyContainer.innerHTML += `
+                <div class="info-card">
+                    <h4><i class="fas fa-clock"></i> Important Info</h4>
+                    <p>Orders close at <strong>10:00 AM daily</strong>.</p>
+                    <p>Call or WhatsApp: <strong>084 299 2881</strong></p>
+                </div>
+            `;
+
+            // FROZEN RENDER
+            const frozenContainer = document.getElementById('frozen-list');
+            frozenContainer.innerHTML = "";
+            frozenMenu.forEach((item, index) => {
+                frozenContainer.innerHTML += `
+                    <div class="grid-card">
+                        <img src="${item.img}" alt="${item.name}">
+                        <h4>${item.name}</h4>
+                        <p>R ${item.price}</p>
+                        <button class="grid-btn" onclick="addToCart('frozen', 0, ${index})">Add to Cart</button>
+                    </div>
+                `;
+            });
+
+            // SAVOURIES RENDER (NEW)
+            const savouriesContainer = document.getElementById('savouries-list');
+            savouriesContainer.innerHTML = "";
+            savouriesMenu.forEach((item, index) => {
+                const descHtml = item.desc ? `<small>${item.desc}</small>` : '';
+                savouriesContainer.innerHTML += `
+                    <div class="grid-card">
+                        <img src="${item.img}" alt="${item.name}">
+                        <h4>${item.name}</h4>
+                        ${descHtml}
+                        <p>R ${item.price}</p>
+                        <button class="grid-btn" onclick="addToCart('savouries', 0, ${index})">Add to Cart</button>
+                    </div>
+                `;
+            });
+
+            // CATERING RENDER
+            const cateringContainer = document.getElementById('catering-list');
+            cateringContainer.innerHTML = "";
+            cateringMenu.forEach((item, index) => {
+                cateringContainer.innerHTML += `
+                    <div class="grid-card">
+                        <img src="${item.img}" alt="${item.name}">
+                        <h4>${item.name}</h4>
+                        <button class="grid-btn" style="background:var(--dark); color:white; border:none;" onclick="addToCart('catering', 0, ${index})">Get Quote</button>
+                    </div>
+                `;
+            });
         }
 
-        function addToCart(type, dayIdx, itemIdx, sideId) {
+        // CART LOGIC
+        function switchTab(tabName) {
+            document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function addToCart(type, dayIndex, itemIndex, sideCheckId = null) {
             let item;
             if (type === 'daily') {
-                const meal = weeklyMenu[dayIdx].options[itemIdx];
-                let price = meal.price;
-                let name = `[${weeklyMenu[dayIdx].day}] ${meal.name}`;
-                const sideBox = document.getElementById(sideId);
-                if (sideBox && sideBox.checked) { price += meal.sidePrice; name += ` (+ ${meal.sideName})`; sideBox.checked = false; }
-                item = { name, price, isQuote: false };
+                const day = weeklyMenu[dayIndex];
+                const meal = day.options[itemIndex];
+                let finalPrice = meal.price;
+                let finalName = meal.name;
+
+                if (sideCheckId) {
+                    const checkbox = document.getElementById(sideCheckId);
+                    if (checkbox && checkbox.checked) {
+                        finalPrice += meal.sidePrice;
+                        finalName += ` (+ ${meal.sideName})`;
+                        checkbox.checked = false; 
+                    }
+                }
+                item = { name: `[${day.day}] ${finalName}`, price: finalPrice, isQuote: false };
             } else if (type === 'frozen') {
-                item = { name: `[Frozen] ${frozenMenu[itemIdx].name}`, price: frozenMenu[itemIdx].price, isQuote: false };
+                const meal = frozenMenu[itemIndex];
+                item = { name: `[Frozen] ${meal.name}`, price: meal.price, isQuote: false };
             } else if (type === 'savouries') {
-                item = { name: `[Savouries] ${savouriesMenu[itemIdx].name}`, price: savouriesMenu[itemIdx].price, isQuote: false };
+                // NEW SAVOURIES ADD
+                const meal = savouriesMenu[itemIndex];
+                item = { name: `[Savouries] ${meal.name}`, price: meal.price, isQuote: false };
             } else {
-                item = { name: `[Bulk Inquiry] ${cateringMenu[itemIdx].name}`, price: 0, isQuote: true };
+                const meal = cateringMenu[itemIndex];
+                item = { name: `[Bulk Inquiry] ${meal.name}`, price: 0, isQuote: true };
             }
-
-            const existing = cart.find(i => i.name === item.name);
-            if (existing) { existing.qty++; } else { item.qty = 1; cart.push(item); }
+            cart.push(item);
             updateTotal();
-        }
-
-        function changeQty(index, delta) {
-            cart[index].qty += delta;
-            if (cart[index].qty <= 0) cart.splice(index, 1);
-            updateTotal();
-            if (cart.length === 0) closeModal(); else renderCartInModal();
+            const btn = event.target.closest('button');
+            if(btn) { btn.style.transform = "scale(0.8)"; setTimeout(() => btn.style.transform = "scale(1)", 200); }
         }
 
         function updateTotal() {
-            let total = 0, count = 0;
-            cart.forEach(i => { total += (i.price * i.qty); count += i.qty; });
-            document.getElementById('total-display').innerText = `R ${total}.00`;
-            document.getElementById('cart-count').innerText = count;
+            let total = 0;
+            let quoteItems = 0;
+            cart.forEach(i => { total += i.price; if(i.isQuote) quoteItems++; });
+            let displayString = `R ${total}.00`;
+            if (quoteItems > 0) displayString += ` + Quote`;
+            document.getElementById('total-display').innerText = displayString;
+            document.getElementById('cart-count').innerText = cart.length;
+        }
+
+        // CHECKOUT & USER DATA
+        function loadUserData() {
+            try {
+                const savedName = localStorage.getItem('custName');
+                const savedAddress = localStorage.getItem('deliveryAddress');
+                if (savedName) document.getElementById('custName').value = savedName;
+                if (savedAddress) document.getElementById('deliveryAddress').value = savedAddress;
+            } catch(e) { console.log("Cookies disabled"); }
+        }
+
+        function saveUserData() {
+            try {
+                const name = document.getElementById('custName').value;
+                const address = document.getElementById('deliveryAddress').value;
+                localStorage.setItem('custName', name);
+                localStorage.setItem('deliveryAddress', address);
+            } catch(e) { console.log("Cookies disabled"); }
         }
 
         function openCheckout() {
-            if (cart.length === 0) return alert("Cart is empty");
+            if (cart.length === 0) { alert("Your cart is empty."); return; }
             renderCartInModal();
+            loadUserData();
             document.getElementById('checkoutModal').style.display = "flex";
             togglePayment(); toggleFulfillment();
         }
+
+        function closeModal() { document.getElementById('checkoutModal').style.display = "none"; }
 
         function renderCartInModal() {
             const container = document.getElementById('cartSummary');
             container.innerHTML = "";
             let total = 0;
-            cart.forEach((item, idx) => {
-                total += (item.price * item.qty);
+            cart.forEach((item, index) => {
+                total += item.price;
                 container.innerHTML += `
                     <div class="cart-item">
-                        <div style="flex:1"><strong>${item.name}</strong><br><small>R${item.price}</small></div>
-                        <div class="qty-controls">
-                            <span class="qty-btn" onclick="changeQty(${idx}, -1)">-</span>
-                            <span class="qty-val">${item.qty}</span>
-                            <span class="qty-btn" onclick="changeQty(${idx}, 1)">+</span>
-                        </div>
-                    </div>`;
+                        <div><strong>${item.name}</strong><br><small>${item.isQuote?'Quote':'R'+item.price}</small></div>
+                        <i class="fas fa-trash remove-btn" onclick="removeFromCart(${index})"></i>
+                    </div>
+                `;
             });
-            document.getElementById('modalTotal').innerText = "Total: R" + total + ".00";
+            const totalText = cart.some(i => i.isQuote) ? `R${total} + Quote` : `R${total}.00`;
+            document.getElementById('modalTotal').innerText = "Total: " + totalText;
         }
 
-        function closeModal() { document.getElementById('checkoutModal').style.display = "none"; }
-        function toggleFulfillment() { 
-            const isDel = document.getElementById('fulfillmentType').value === 'Delivery';
-            document.getElementById('deliveryBox').style.display = isDel ? 'block' : 'none';
-            document.getElementById('collectionBox').style.display = isDel ? 'none' : 'block';
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateTotal();
+            if (cart.length === 0) closeModal();
+            else renderCartInModal();
         }
+
+        function toggleFulfillment() {
+            const type = document.getElementById('fulfillmentType').value;
+            const delBox = document.getElementById('deliveryBox');
+            const colBox = document.getElementById('collectionBox');
+            if (type === 'Delivery') { delBox.style.display = 'block'; colBox.style.display = 'none'; } 
+            else { delBox.style.display = 'none'; colBox.style.display = 'block'; }
+        }
+
         function togglePayment() {
-            const val = document.getElementById('paymentMethod').value;
-            document.getElementById('eftBox').style.display = val === 'EFT' ? 'block' : 'none';
-            document.getElementById('payfastBox').style.display = val === 'Online/Card' ? 'block' : 'none';
+            const type = document.getElementById('paymentMethod').value;
+            const eftBox = document.getElementById('eftBox');
+            const payfastBox = document.getElementById('payfastBox');
+            eftBox.style.display = (type === 'EFT') ? 'block' : 'none';
+            payfastBox.style.display = (type === 'Online/Card') ? 'block' : 'none';
         }
 
+        // --- FIXED SEND ORDER FUNCTION (WHATSAPP PRIORITY) ---
         function sendWhatsAppOrder() {
-            const name = document.getElementById('custName').value || "Guest";
-            const fulfillment = document.getElementById('fulfillmentType').value;
-            const address = document.getElementById('deliveryAddress').value;
-            if (fulfillment === 'Delivery' && !address) return alert("Address required");
+            try {
+                // 1. Gather Data
+                saveUserData();
+                const name = document.getElementById('custName').value || "Guest";
+                const fulfillment = document.getElementById('fulfillmentType').value;
+                const payment = document.getElementById('paymentMethod').value;
+                const address = document.getElementById('deliveryAddress').value;
 
-            let msg = `*New Order from ${name}*%0A%0A`;
-            let total = 0;
-            cart.forEach(i => {
-                msg += `• ${i.qty}x ${i.name} (R${i.price * i.qty})%0A`;
-                total += (i.price * i.qty);
-            });
-            msg += `%0A*TOTAL: R${total}.00*%0A📍 ${fulfillment}${fulfillment==='Delivery'?' - '+address:''}%0A💳 ${document.getElementById('paymentMethod').value}`;
+                // Validation
+                if (fulfillment === 'Delivery' && (!address || address.trim() === '')) {
+                    alert("Please enter a delivery address.");
+                    return;
+                }
 
-            window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
-            closeModal();
+                // 2. Build Message
+                let itemString = "";
+                let total = 0;
+                cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
+
+                let msg = `*New Order from ${name}* 🥘%0A%0A`;
+                let standardItems = cart.filter(i => !i.isQuote);
+                let quoteItems = cart.filter(i => i.isQuote);
+
+                if (standardItems.length > 0) {
+                    msg += "*ORDER:*%0A";
+                    standardItems.forEach(item => msg += `• ${item.name} (R${item.price})%0A`);
+                }
+                if (quoteItems.length > 0) {
+                    msg += "%0A*QUOTE REQUEST:*%0A";
+                    quoteItems.forEach(item => msg += `• ${item.name.replace('[Bulk Inquiry] ', '')}%0A`);
+                }
+
+                msg += `%0A*TOTAL: R${total}.00*%0A`;
+                msg += `%0A----------------%0A`;
+                msg += `📍 *${fulfillment}*%0A`;
+                if (fulfillment === 'Delivery') { msg += `🏠 Addr: ${address}%0A`; } 
+                else { msg += `(Collection from Ottery)%0A`; }
+                msg += `💳 *${payment}*%0A`;
+                if (payment === "Online/Card") msg += "_(Please confirm if paid via PayFast link)_";
+
+                // 3. OPEN WHATSAPP (PRIORITY)
+                window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
+                closeModal();
+
+                // 4. Send to Google Sheets (Background)
+                const formData = new FormData();
+                formData.append("Date", new Date().toLocaleString());
+                formData.append("Name", name);
+                formData.append("Phone", PHONE_NUMBER); 
+                formData.append("Method", fulfillment);
+                formData.append("Payment", payment);
+                formData.append("Total", total);
+                formData.append("Items", itemString);
+                formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
+                
+                if (ORDER_SCRIPT_URL.includes("script.google.com")) {
+                    fetch(ORDER_SCRIPT_URL, { 
+                        method: 'POST', 
+                        body: formData,
+                        mode: 'no-cors' 
+                    });
+                }
+
+            } catch (error) {
+                alert("An error occurred. Please check your details.");
+                console.error(error);
+            }
         }
+        
+        window.onclick = function(e) { if (e.target == document.getElementById('checkoutModal')) closeModal(); }
 
+        // Start App
         init();
     </script>
 </body>
