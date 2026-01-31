@@ -110,7 +110,7 @@
             transform: translateY(-2px);
         }
 
-        /* --- CONTAINERS --- */
+        /* --- MENU CONTAINERS --- */
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; display: none; animation: fadeIn 0.4s ease; }
         .container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -134,6 +134,16 @@
         .meal-info p { font-size: 0.85rem; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
         .meal-price { color: var(--primary-dark); font-weight: 700; font-size: 1.1rem; }
         
+        /* SIDE OPTION STYLE */
+        .side-label {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.8rem; color: var(--gray);
+            margin-top: 8px; background: #f8f9fa;
+            padding: 5px 10px; border-radius: 8px; cursor: pointer;
+            border: 1px solid #eee;
+        }
+        .side-label input { width: auto; margin: 0; }
+
         .add-btn { 
             background: var(--dark); color: white; border: none; 
             width: 40px; height: 40px; border-radius: 50%; 
@@ -355,7 +365,6 @@
 
         // --- 1. DATA STORAGE ---
         let cart = [];
-        // Default data (Shown while loading)
         let weeklyMenu = [
             { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
             { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
@@ -365,7 +374,6 @@
 
         // --- 2. INITIALIZATION ---
         function init() {
-            // Fetch data from your Google Sheet
             Papa.parse(MENU_SHEET_URL, {
                 download: true, header: true,
                 complete: function(results) { processData(results.data); },
@@ -375,7 +383,6 @@
 
         // --- 3. PROCESS DATA ---
         function processData(data) {
-            // Reset arrays
             weeklyMenu = [
                 { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
                 { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
@@ -385,12 +392,21 @@
             data.forEach(row => {
                 if(!row.Name) return;
                 
-                // Read price (remove 'R' if present)
                 let price = row.Price ? parseInt(row.Price.toString().replace(/[^0-9]/g, '')) : 0;
+                let sidePrice = row.SidePrice ? parseInt(row.SidePrice.toString().replace(/[^0-9]/g, '')) : 0;
 
                 if (row.Type === "Daily") {
                     const dayObj = weeklyMenu.find(d => d.day.includes(row.Day));
-                    if (dayObj) dayObj.options.push({ name: row.Name, price: price, desc: row.Desc, img: row.ImageLink });
+                    if (dayObj) {
+                        dayObj.options.push({ 
+                            name: row.Name, 
+                            price: price, 
+                            desc: row.Desc, 
+                            img: row.ImageLink,
+                            sideName: row.SideName || null,
+                            sidePrice: sidePrice
+                        });
+                    }
                 } else if (row.Type === "Frozen") {
                     frozenMenu.push({ name: row.Name, price: price, img: row.ImageLink });
                 } else if (row.Type === "Catering") {
@@ -403,14 +419,14 @@
         // --- 4. RENDER APP ---
         function renderApp() {
             const now = new Date();
-            const currentDay = now.getDay(); // 0=Sun, 1=Mon...
-            const currentHour = now.getHours(); // 0-23
+            const currentDay = now.getDay(); 
+            const currentHour = now.getHours(); 
 
-            // Helper: Get Date String
+            // Helper: Date String
             function getMenuDate(targetDayIndex) {
                 const d = new Date();
                 const day = d.getDay();
-                const diff = d.getDate() - day + (day == 0 ? -6 : 1); // Adjust to Monday
+                const diff = d.getDate() - day + (day == 0 ? -6 : 1);
                 const monday = new Date(d.setDate(diff));
                 const targetDate = new Date(monday);
                 targetDate.setDate(monday.getDate() + (targetDayIndex - 1));
@@ -422,14 +438,14 @@
             dailyContainer.innerHTML = "";
             
             weeklyMenu.forEach((dayPlan, index) => {
-                const dayIndex = index + 1; // Mon=1
+                const dayIndex = index + 1; 
                 const dateStr = getMenuDate(dayIndex);
                 
-                // Lock Logic
+                // Smart Lock
                 let isLocked = false;
-                if (currentDay > dayIndex) { isLocked = true; } // Past day
-                else if (currentDay === dayIndex && currentHour >= 10) { isLocked = true; } // Today > 10am
-                if (currentDay === 0) isLocked = false; // Sunday opens everything
+                if (currentDay > dayIndex) { isLocked = true; } 
+                else if (currentDay === dayIndex && currentHour >= 10) { isLocked = true; } 
+                if (currentDay === 0) isLocked = false; 
 
                 const cardClass = isLocked ? "meal-card closed" : "meal-card";
                 const btnIcon = isLocked ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-plus"></i>';
@@ -439,9 +455,20 @@
                 
                 if (dayPlan.options.length > 0) {
                     dayPlan.options.forEach((meal, mealIndex) => {
-                        const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex})"`;
+                        const sideCheckId = `side-${index}-${mealIndex}`;
+                        const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex}, '${sideCheckId}')"`;
                         const itemPrice = isLocked ? 'Closed' : 'R ' + meal.price;
                         
+                        let sideHtml = "";
+                        if(meal.sideName) {
+                            sideHtml = `
+                                <label class="side-label" onclick="event.stopPropagation()">
+                                    <input type="checkbox" id="${sideCheckId}"> 
+                                    + ${meal.sideName} (R${meal.sidePrice})
+                                </label>
+                            `;
+                        }
+
                         html += `
                             <div class="${cardClass}">
                                 <img src="${meal.img}" class="meal-thumb">
@@ -449,6 +476,7 @@
                                     <h3>${meal.name}</h3>
                                     <p>${meal.desc}</p>
                                     <span class="meal-price">${itemPrice}</span>
+                                    ${sideHtml}
                                 </div>
                                 <button class="${btnClass}" ${clickAttr}>${btnIcon}</button>
                             </div>
@@ -505,12 +533,23 @@
             event.target.classList.add('active');
         }
 
-        function addToCart(type, dayIndex, itemIndex) {
+        function addToCart(type, dayIndex, itemIndex, sideCheckId = null) {
             let item;
             if (type === 'daily') {
                 const day = weeklyMenu[dayIndex];
                 const meal = day.options[itemIndex];
-                item = { name: `[${day.day}] ${meal.name}`, price: meal.price, isQuote: false };
+                let finalPrice = meal.price;
+                let finalName = meal.name;
+
+                if (sideCheckId) {
+                    const checkbox = document.getElementById(sideCheckId);
+                    if (checkbox && checkbox.checked) {
+                        finalPrice += meal.sidePrice;
+                        finalName += ` (+ ${meal.sideName})`;
+                        checkbox.checked = false; 
+                    }
+                }
+                item = { name: `[${day.day}] ${finalName}`, price: finalPrice, isQuote: false };
             } else if (type === 'frozen') {
                 const meal = frozenMenu[itemIndex];
                 item = { name: `[Frozen] ${meal.name}`, price: meal.price, isQuote: false };
@@ -600,6 +639,7 @@
         }
 
         function sendWhatsAppOrder() {
+            saveUserData();
             const name = document.getElementById('custName').value || "Guest";
             const fulfillment = document.getElementById('fulfillmentType').value;
             const payment = document.getElementById('paymentMethod').value;
@@ -610,28 +650,26 @@
                 return;
             }
 
-            localStorage.setItem('custName', name);
-            localStorage.setItem('deliveryAddress', address);
-
-            // 1. Send to Google Sheets
+            // Send to Google Sheets
             let itemString = "";
             let total = 0;
             cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
 
-            if (ORDER_SCRIPT_URL.includes("script.google.com")) {
-                const formData = new FormData();
-                formData.append("Date", new Date());
-                formData.append("Name", name);
-                formData.append("Phone", PHONE_NUMBER); 
-                formData.append("Method", fulfillment);
-                formData.append("Payment", payment);
-                formData.append("Total", total);
-                formData.append("Items", itemString);
-                formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
-                fetch(ORDER_SCRIPT_URL, { method: 'POST', body: formData }).catch(e => console.error(e));
-            }
+            const formData = new FormData();
+            formData.append("Date", new Date());
+            formData.append("Name", name);
+            formData.append("Phone", PHONE_NUMBER); 
+            formData.append("Method", fulfillment);
+            formData.append("Payment", payment);
+            formData.append("Total", total);
+            formData.append("Items", itemString);
+            formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
+            
+            fetch(ORDER_SCRIPT_URL, { method: 'POST', body: formData })
+                .then(() => console.log("Order Sent to Sheet"))
+                .catch(e => console.error("Error sending to sheet", e));
 
-            // 2. WhatsApp
+            // WhatsApp Message
             let msg = `*New Order from ${name}* 🥘%0A%0A`;
             let standardItems = cart.filter(i => !i.isQuote);
             let quoteItems = cart.filter(i => i.isQuote);
