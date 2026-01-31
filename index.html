@@ -416,39 +416,33 @@
             renderApp();
         }
 
-// --- 4. RENDER APP ---
+        // --- 4. RENDER APP ---
         function renderApp() {
             const now = new Date();
-            let currentDay = now.getDay(); // 0=Sun, 1=Mon...
-            const currentHour = now.getHours(); // 0-23
+            const currentDay = now.getDay(); 
+            const currentHour = now.getHours(); 
+            const currentMinute = now.getMinutes();
 
-            // --- WEEKEND LOGIC ---
-            // If today is Saturday (6) or Sunday (0), we assume you are showing NEXT week's menu.
-            // We set an 'offset' to calculate future dates.
+            // --- WEEKEND LOGIC (SHOW NEXT WEEK) ---
             let isNextWeek = (currentDay === 6 || currentDay === 0);
-            
-            // Helper: Get Date String
+
+            // Helper: Date String
             function getMenuDate(targetDayIndex) {
                 const d = new Date();
                 
-                // If it's the weekend, add 7 days to 'd' to look at next week
                 if (isNextWeek) {
-                    // If Sunday, add 1 day to get Monday. If Saturday, add 2 days.
-                    // Easier way: just jump forward to next Monday based on current day
+                    // Jump to next Monday
                     if (currentDay === 6) d.setDate(d.getDate() + 2); // Sat -> Mon
                     if (currentDay === 0) d.setDate(d.getDate() + 1); // Sun -> Mon
                 } else {
-                    // Standard Logic for Mon-Fri
+                    // This week's Monday
                     const day = d.getDay();
                     const diff = d.getDate() - day + (day == 0 ? -6 : 1);
-                    d.setDate(diff); // Jump to this week's Monday
+                    d.setDate(diff); 
                 }
 
-                // Now 'd' is effectively the Monday we want. 
-                // Add the target index (0 for Mon, 1 for Tue...)
                 const targetDate = new Date(d);
                 targetDate.setDate(d.getDate() + (targetDayIndex - 1));
-                
                 return targetDate.getDate() + "/" + (targetDate.getMonth() + 1);
             }
 
@@ -457,19 +451,22 @@
             dailyContainer.innerHTML = "";
             
             weeklyMenu.forEach((dayPlan, index) => {
-                const dayIndex = index + 1; // Mon=1
+                const dayIndex = index + 1; 
                 const dateStr = getMenuDate(dayIndex);
                 
                 // --- SMART LOCK LOGIC ---
                 let isLocked = false;
-
                 if (isNextWeek) {
-                    // If we are viewing Next Week, NOTHING is locked yet.
-                    isLocked = false;
+                    isLocked = false; // Next week is fully open
                 } else {
-                    // Standard Week Logic (Mon-Fri)
+                    // Standard Week
                     if (currentDay > dayIndex) { isLocked = true; } // Past day
-                    else if (currentDay === dayIndex && currentHour >= 10) { isLocked = true; } // Today > 10am
+                    else if (currentDay === dayIndex) {
+                        // Today: Lock if > 10:00
+                        if (currentHour > 10 || (currentHour === 10 && currentMinute >= 1)) { 
+                            isLocked = true; 
+                        }
+                    }
                 }
 
                 const cardClass = isLocked ? "meal-card closed" : "meal-card";
@@ -535,20 +532,6 @@
                     </div>
                 `;
             });
-
-            // RENDER CATERING
-            const cateringContainer = document.getElementById('catering-list');
-            cateringContainer.innerHTML = "";
-            cateringMenu.forEach((item, index) => {
-                cateringContainer.innerHTML += `
-                    <div class="grid-card">
-                        <img src="${item.img}" alt="${item.name}">
-                        <h4>${item.name}</h4>
-                        <button class="grid-btn" style="background:var(--dark); color:white; border:none;" onclick="addToCart('catering', 0, ${index})">Get Quote</button>
-                    </div>
-                `;
-            });
-        }
 
             // RENDER CATERING
             const cateringContainer = document.getElementById('catering-list');
@@ -741,4 +724,3 @@
     </script>
 </body>
 </html>
-
