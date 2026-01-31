@@ -325,10 +325,13 @@
 
             <div id="eftBox" class="dynamic-info-box">
                 <strong>🏦 Banking Details:</strong><br>
-                Bank: [Capitec/FNB]<br>
-                Acc No: [123456789]<br>
-                Ref: [Your Name]<br>
-                Please send POP to WhatsApp.
+                Bank: Nedbank<br>
+                Acc Name: MR Nazeer T/a Mealtoday<br>
+                Acc No: 1152674110<br>
+                Branch: Lansdowne (198765)<br>
+                Type: Cheque Account<br>
+                <br>
+                <em>Please send POP to WhatsApp.</em>
             </div>
 
             <div id="payfastBox" class="dynamic-info-box" style="display:block;">
@@ -355,12 +358,15 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        // CONFIGURATION
-        const PHONE_NUMBER = "27842992881"; 
+        // const PHONE_NUMBER = "27842992881"; 
+        
+        // 1. YOUR GOOGLE MENU SHEET
         const MENU_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSdr9Q5N2H5hzkR2a61fy2n0T6uDHeom-twanZI5m-tGvvahTcqw04zY28IbVQARa3fe1gJqqqR2nZz/pub?gid=0&single=true&output=csv";
+        
+        // 2. YOUR ORDER TRACKER SCRIPT
         const ORDER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNnQtP6JdpJD3GHwF5gCN4KJAZVRu_kxOzJ2jKg5LkNPZVo0Q1o0Cb2NXFtT-hS0igIQ/exec";
 
-        // DATA STORAGE
+        // --- 1. DATA STORAGE ---
         let cart = [];
         let weeklyMenu = [
             { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
@@ -369,7 +375,7 @@
         let frozenMenu = [];
         let cateringMenu = [];
 
-        // INITIALIZATION
+        // --- 2. INITIALIZATION ---
         function init() {
             Papa.parse(MENU_SHEET_URL, {
                 download: true, header: true,
@@ -378,7 +384,7 @@
             });
         }
 
-        // PROCESS DATA
+        // --- 3. PROCESS DATA ---
         function processData(data) {
             weeklyMenu = [
                 { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
@@ -413,7 +419,7 @@
             renderApp();
         }
 
-        // RENDER APP
+        // --- 4. RENDER APP ---
         function renderApp() {
             const now = new Date();
             const currentDay = now.getDay(); 
@@ -532,7 +538,7 @@
             });
         }
 
-        // CART LOGIC
+        // --- CART LOGIC ---
         function switchTab(tabName) {
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -580,7 +586,7 @@
             document.getElementById('cart-count').innerText = cart.length;
         }
 
-        // CHECKOUT & USER DATA
+        // --- CHECKOUT ---
         function loadUserData() {
             try {
                 const savedName = localStorage.getItem('custName');
@@ -649,7 +655,7 @@
             payfastBox.style.display = (type === 'Online/Card') ? 'block' : 'none';
         }
 
-        // --- FIXED ORDER FUNCTION (WHATSAPP FIRST) ---
+        // --- FIXED SEND ORDER FUNCTION (WHATSAPP PRIORITY) ---
         function sendWhatsAppOrder() {
             try {
                 // 1. Gather Data
@@ -727,4 +733,3 @@
     </script>
 </body>
 </html>
-
