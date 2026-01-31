@@ -423,30 +423,24 @@
             const currentHour = now.getHours(); 
             const currentMinute = now.getMinutes();
 
-            // --- WEEKEND LOGIC (SHOW NEXT WEEK) ---
+            // WEEKEND LOGIC
             let isNextWeek = (currentDay === 6 || currentDay === 0);
 
-            // Helper: Date String
             function getMenuDate(targetDayIndex) {
                 const d = new Date();
-                
                 if (isNextWeek) {
-                    // Jump to next Monday
-                    if (currentDay === 6) d.setDate(d.getDate() + 2); // Sat -> Mon
-                    if (currentDay === 0) d.setDate(d.getDate() + 1); // Sun -> Mon
+                    if (currentDay === 6) d.setDate(d.getDate() + 2);
+                    if (currentDay === 0) d.setDate(d.getDate() + 1);
                 } else {
-                    // This week's Monday
                     const day = d.getDay();
                     const diff = d.getDate() - day + (day == 0 ? -6 : 1);
                     d.setDate(diff); 
                 }
-
                 const targetDate = new Date(d);
                 targetDate.setDate(d.getDate() + (targetDayIndex - 1));
                 return targetDate.getDate() + "/" + (targetDate.getMonth() + 1);
             }
 
-            // RENDER DAILY
             const dailyContainer = document.getElementById('daily');
             dailyContainer.innerHTML = "";
             
@@ -454,15 +448,12 @@
                 const dayIndex = index + 1; 
                 const dateStr = getMenuDate(dayIndex);
                 
-                // --- SMART LOCK LOGIC ---
                 let isLocked = false;
                 if (isNextWeek) {
-                    isLocked = false; // Next week is fully open
+                    isLocked = false; 
                 } else {
-                    // Standard Week
-                    if (currentDay > dayIndex) { isLocked = true; } // Past day
+                    if (currentDay > dayIndex) { isLocked = true; } 
                     else if (currentDay === dayIndex) {
-                        // Today: Lock if > 10:00
                         if (currentHour > 10 || (currentHour === 10 && currentMinute >= 1)) { 
                             isLocked = true; 
                         }
@@ -510,7 +501,6 @@
                 dailyContainer.innerHTML += html;
             });
 
-            // INFO CARD
             dailyContainer.innerHTML += `
                 <div class="info-card">
                     <h4><i class="fas fa-clock"></i> Important Info</h4>
@@ -519,7 +509,6 @@
                 </div>
             `;
 
-            // RENDER FROZEN
             const frozenContainer = document.getElementById('frozen-list');
             frozenContainer.innerHTML = "";
             frozenMenu.forEach((item, index) => {
@@ -533,7 +522,6 @@
                 `;
             });
 
-            // RENDER CATERING
             const cateringContainer = document.getElementById('catering-list');
             cateringContainer.innerHTML = "";
             cateringMenu.forEach((item, index) => {
@@ -597,17 +585,21 @@
 
         // --- CHECKOUT ---
         function loadUserData() {
-            const savedName = localStorage.getItem('custName');
-            const savedAddress = localStorage.getItem('deliveryAddress');
-            if (savedName) document.getElementById('custName').value = savedName;
-            if (savedAddress) document.getElementById('deliveryAddress').value = savedAddress;
+            try {
+                const savedName = localStorage.getItem('custName');
+                const savedAddress = localStorage.getItem('deliveryAddress');
+                if (savedName) document.getElementById('custName').value = savedName;
+                if (savedAddress) document.getElementById('deliveryAddress').value = savedAddress;
+            } catch(e) { console.log("Cookies disabled"); }
         }
 
         function saveUserData() {
-            const name = document.getElementById('custName').value;
-            const address = document.getElementById('deliveryAddress').value;
-            localStorage.setItem('custName', name);
-            localStorage.setItem('deliveryAddress', address);
+            try {
+                const name = document.getElementById('custName').value;
+                const address = document.getElementById('deliveryAddress').value;
+                localStorage.setItem('custName', name);
+                localStorage.setItem('deliveryAddress', address);
+            } catch(e) { console.log("Cookies disabled"); }
         }
 
         function openCheckout() {
@@ -660,61 +652,78 @@
             payfastBox.style.display = (type === 'Online/Card') ? 'block' : 'none';
         }
 
+        // --- UPDATED SEND ORDER FUNCTION (FIXED) ---
         function sendWhatsAppOrder() {
-            saveUserData();
-            const name = document.getElementById('custName').value || "Guest";
-            const fulfillment = document.getElementById('fulfillmentType').value;
-            const payment = document.getElementById('paymentMethod').value;
-            const address = document.getElementById('deliveryAddress').value;
+            try {
+                // 1. Gather Data
+                saveUserData();
+                const name = document.getElementById('custName').value || "Guest";
+                const fulfillment = document.getElementById('fulfillmentType').value;
+                const payment = document.getElementById('paymentMethod').value;
+                const address = document.getElementById('deliveryAddress').value;
 
-            if (fulfillment === 'Delivery' && address.trim() === '') {
-                alert("Please enter a delivery address.");
-                return;
+                // Validation
+                if (fulfillment === 'Delivery' && (!address || address.trim() === '')) {
+                    alert("Please enter a delivery address.");
+                    return;
+                }
+
+                // 2. Prepare Database Data
+                let itemString = "";
+                let total = 0;
+                cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
+
+                const formData = new FormData();
+                formData.append("Date", new Date().toLocaleString());
+                formData.append("Name", name);
+                formData.append("Phone", PHONE_NUMBER); 
+                formData.append("Method", fulfillment);
+                formData.append("Payment", payment);
+                formData.append("Total", total);
+                formData.append("Items", itemString);
+                formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
+                
+                // 3. Send to Google Sheets (NO-CORS mode fixes the freeze)
+                if (ORDER_SCRIPT_URL.includes("script.google.com")) {
+                    fetch(ORDER_SCRIPT_URL, { 
+                        method: 'POST', 
+                        body: formData,
+                        mode: 'no-cors' // <--- THIS IS THE KEY FIX
+                    }).catch(e => console.log("Sheet Error (Ignored): " + e));
+                }
+
+                // 4. Send to WhatsApp (Immediately)
+                let msg = `*New Order from ${name}* 🥘%0A%0A`;
+                let standardItems = cart.filter(i => !i.isQuote);
+                let quoteItems = cart.filter(i => i.isQuote);
+
+                if (standardItems.length > 0) {
+                    msg += "*ORDER:*%0A";
+                    standardItems.forEach(item => msg += `• ${item.name} (R${item.price})%0A`);
+                }
+                if (quoteItems.length > 0) {
+                    msg += "%0A*QUOTE REQUEST:*%0A";
+                    quoteItems.forEach(item => msg += `• ${item.name.replace('[Bulk Inquiry] ', '')}%0A`);
+                }
+
+                msg += `%0A*TOTAL: R${total}.00*%0A`;
+                msg += `%0A----------------%0A`;
+                msg += `📍 *${fulfillment}*%0A`;
+                if (fulfillment === 'Delivery') { msg += `🏠 Addr: ${address}%0A`; } 
+                else { msg += `(Collection from Ottery)%0A`; }
+                msg += `💳 *${payment}*%0A`;
+                if (payment === "Online/Card") msg += "_(Please confirm if paid via PayFast link)_";
+                
+                // Use setTimeout to ensure the fetch request has a micro-second to initiate
+                setTimeout(() => {
+                    window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
+                    closeModal();
+                }, 100);
+
+            } catch (error) {
+                alert("An error occurred. Please try again or message us directly.");
+                console.error(error);
             }
-
-            // Send to Google Sheets
-            let itemString = "";
-            let total = 0;
-            cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
-
-            const formData = new FormData();
-            formData.append("Date", new Date());
-            formData.append("Name", name);
-            formData.append("Phone", PHONE_NUMBER); 
-            formData.append("Method", fulfillment);
-            formData.append("Payment", payment);
-            formData.append("Total", total);
-            formData.append("Items", itemString);
-            formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
-            
-            fetch(ORDER_SCRIPT_URL, { method: 'POST', body: formData })
-                .then(() => console.log("Order Sent to Sheet"))
-                .catch(e => console.error("Error sending to sheet", e));
-
-            // WhatsApp Message
-            let msg = `*New Order from ${name}* 🥘%0A%0A`;
-            let standardItems = cart.filter(i => !i.isQuote);
-            let quoteItems = cart.filter(i => i.isQuote);
-
-            if (standardItems.length > 0) {
-                msg += "*ORDER:*%0A";
-                standardItems.forEach(item => msg += `• ${item.name} (R${item.price})%0A`);
-            }
-            if (quoteItems.length > 0) {
-                msg += "%0A*QUOTE REQUEST:*%0A";
-                quoteItems.forEach(item => msg += `• ${item.name.replace('[Bulk Inquiry] ', '')}%0A`);
-            }
-
-            msg += `%0A*TOTAL: R${total}.00*%0A`;
-            msg += `%0A----------------%0A`;
-            msg += `📍 *${fulfillment}*%0A`;
-            if (fulfillment === 'Delivery') { msg += `🏠 Addr: ${address}%0A`; } 
-            else { msg += `(Collection from Ottery)%0A`; }
-            msg += `💳 *${payment}*%0A`;
-            if (payment === "Online/Card") msg += "_(Please confirm if paid via PayFast link)_";
-            
-            window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
-            closeModal();
         }
         
         window.onclick = function(e) { if (e.target == document.getElementById('checkoutModal')) closeModal(); }
@@ -724,3 +733,4 @@
     </script>
 </body>
 </html>
+
