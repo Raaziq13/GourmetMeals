@@ -355,15 +355,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        // const PHONE_NUMBER = "27842992881"; 
-        
-        // 1. YOUR GOOGLE MENU SHEET
+        // CONFIGURATION
+        const PHONE_NUMBER = "27842992881"; 
         const MENU_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSdr9Q5N2H5hzkR2a61fy2n0T6uDHeom-twanZI5m-tGvvahTcqw04zY28IbVQARa3fe1gJqqqR2nZz/pub?gid=0&single=true&output=csv";
-        
-        // 2. YOUR ORDER TRACKER SCRIPT
         const ORDER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNnQtP6JdpJD3GHwF5gCN4KJAZVRu_kxOzJ2jKg5LkNPZVo0Q1o0Cb2NXFtT-hS0igIQ/exec";
 
-        // --- 1. DATA STORAGE ---
+        // DATA STORAGE
         let cart = [];
         let weeklyMenu = [
             { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
@@ -372,7 +369,7 @@
         let frozenMenu = [];
         let cateringMenu = [];
 
-        // --- 2. INITIALIZATION ---
+        // INITIALIZATION
         function init() {
             Papa.parse(MENU_SHEET_URL, {
                 download: true, header: true,
@@ -381,7 +378,7 @@
             });
         }
 
-        // --- 3. PROCESS DATA ---
+        // PROCESS DATA
         function processData(data) {
             weeklyMenu = [
                 { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
@@ -416,7 +413,7 @@
             renderApp();
         }
 
-        // --- 4. RENDER APP ---
+        // RENDER APP
         function renderApp() {
             const now = new Date();
             const currentDay = now.getDay(); 
@@ -535,7 +532,7 @@
             });
         }
 
-        // --- CART LOGIC ---
+        // CART LOGIC
         function switchTab(tabName) {
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -583,7 +580,7 @@
             document.getElementById('cart-count').innerText = cart.length;
         }
 
-        // --- CHECKOUT ---
+        // CHECKOUT & USER DATA
         function loadUserData() {
             try {
                 const savedName = localStorage.getItem('custName');
@@ -652,7 +649,7 @@
             payfastBox.style.display = (type === 'Online/Card') ? 'block' : 'none';
         }
 
-        // --- UPDATED SEND ORDER FUNCTION (FIXED) ---
+        // --- FIXED ORDER FUNCTION (WHATSAPP FIRST) ---
         function sendWhatsAppOrder() {
             try {
                 // 1. Gather Data
@@ -668,31 +665,11 @@
                     return;
                 }
 
-                // 2. Prepare Database Data
+                // 2. Build Message
                 let itemString = "";
                 let total = 0;
                 cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
 
-                const formData = new FormData();
-                formData.append("Date", new Date().toLocaleString());
-                formData.append("Name", name);
-                formData.append("Phone", PHONE_NUMBER); 
-                formData.append("Method", fulfillment);
-                formData.append("Payment", payment);
-                formData.append("Total", total);
-                formData.append("Items", itemString);
-                formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
-                
-                // 3. Send to Google Sheets (NO-CORS mode fixes the freeze)
-                if (ORDER_SCRIPT_URL.includes("script.google.com")) {
-                    fetch(ORDER_SCRIPT_URL, { 
-                        method: 'POST', 
-                        body: formData,
-                        mode: 'no-cors' // <--- THIS IS THE KEY FIX
-                    }).catch(e => console.log("Sheet Error (Ignored): " + e));
-                }
-
-                // 4. Send to WhatsApp (Immediately)
                 let msg = `*New Order from ${name}* 🥘%0A%0A`;
                 let standardItems = cart.filter(i => !i.isQuote);
                 let quoteItems = cart.filter(i => i.isQuote);
@@ -713,15 +690,32 @@
                 else { msg += `(Collection from Ottery)%0A`; }
                 msg += `💳 *${payment}*%0A`;
                 if (payment === "Online/Card") msg += "_(Please confirm if paid via PayFast link)_";
+
+                // 3. OPEN WHATSAPP (PRIORITY)
+                window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
+                closeModal();
+
+                // 4. Send to Google Sheets (Background)
+                const formData = new FormData();
+                formData.append("Date", new Date().toLocaleString());
+                formData.append("Name", name);
+                formData.append("Phone", PHONE_NUMBER); 
+                formData.append("Method", fulfillment);
+                formData.append("Payment", payment);
+                formData.append("Total", total);
+                formData.append("Items", itemString);
+                formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
                 
-                // Use setTimeout to ensure the fetch request has a micro-second to initiate
-                setTimeout(() => {
-                    window.open(`https://wa.me/${PHONE_NUMBER}?text=${msg}`, '_blank');
-                    closeModal();
-                }, 100);
+                if (ORDER_SCRIPT_URL.includes("script.google.com")) {
+                    fetch(ORDER_SCRIPT_URL, { 
+                        method: 'POST', 
+                        body: formData,
+                        mode: 'no-cors' 
+                    });
+                }
 
             } catch (error) {
-                alert("An error occurred. Please try again or message us directly.");
+                alert("An error occurred. Please check your details.");
                 console.error(error);
             }
         }
@@ -733,4 +727,3 @@
     </script>
 </body>
 </html>
-
