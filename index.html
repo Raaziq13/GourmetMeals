@@ -127,8 +127,8 @@
             display: flex; align-items: center; gap: 15px; 
             border: 1px solid rgba(0,0,0,0.02);
         }
-        .meal-card.closed { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
-        .meal-thumb { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
+        .meal-card.closed { opacity: 0.5; filter: grayscale(100%); pointer-events: none; background: #f4f4f4; }
+        .meal-thumb { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
         .meal-info { flex: 1; }
         .meal-info h3 { font-size: 1.1rem; margin-bottom: 4px; color: var(--dark); }
         .meal-info p { font-size: 0.85rem; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
@@ -151,12 +151,12 @@
             text-align: center; box-shadow: var(--shadow); 
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .grid-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; }
+        .grid-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; }
         .grid-card h4 { font-size: 1rem; margin-bottom: 5px; font-weight: 600; }
         .grid-card p { color: var(--primary-dark); font-weight: 700; margin-bottom: 10px; }
         .grid-btn { 
             background: white; border: 2px solid var(--dark); color: var(--dark); 
-            padding: 8px; border-radius: 8px; font-weight: 600; font-size: 0.8rem;
+            padding: 8px; border-radius: 8px; font-weight: 600; font-size: 0.8rem; cursor: pointer;
         }
 
         /* --- INFO BOX --- */
@@ -199,7 +199,7 @@
             max-height: 150px; overflow-y: auto; margin-bottom: 20px;
         }
         .cart-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-        .remove-btn { color: #ff7675; cursor: pointer; }
+        .remove-btn { color: #ff7675; cursor: pointer; padding: 5px; }
         
         .form-group { margin-bottom: 15px; }
         .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 5px; display: block; }
@@ -254,13 +254,20 @@
         <button class="tab-btn" onclick="switchTab('catering')">Catering</button>
     </div>
 
-    <div id="daily" class="container active"></div>
+    <div id="daily" class="container active">
+        <div style="text-align:center; padding:40px; color:#999;">Loading Menu...</div>
+    </div>
+
     <div id="frozen" class="container">
         <h2 class="day-header">Freezer Stash</h2>
         <div class="grid-layout" id="frozen-list"></div>
     </div>
+
     <div id="catering" class="container">
         <h2 class="day-header">Catering Portfolio</h2>
+        <div style="text-align:center; margin-bottom:20px; color:#666;">
+            Looking for a large order? Ideal for groups of 20+ people.
+        </div>
         <div class="grid-layout" id="catering-list"></div>
     </div>
     
@@ -336,123 +343,123 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script>
-        const PHONE_NUMBER = "27842992881"; 
+        // const PHONE_NUMBER = "27842992881"; 
+        
+        // 1. PASTE YOUR GOOGLE SHEET CSV LINK HERE:
+        const MENU_SHEET_URL = "PASTE_YOUR_CSV_LINK_HERE";
+        
+        // 2. PASTE YOUR APPS SCRIPT URL HERE:
+        const ORDER_SCRIPT_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
 
-        const weeklyMenu = [
-            {
-                day: "Monday",
-                options: [
-                    { name: "Steak Stirfry", price: 80, desc: "Egg noodles & veg", img: "https://images.unsplash.com/photo-1543362906-ac1b48261626?w=200" },
-                    { name: "Braised Steak", price: 80, desc: "Savoury veggie rice", img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=200" },
-                    { name: "Side: Beetroot Salad", price: 10, desc: "Fresh & pickled", img: "https://images.unsplash.com/photo-1599307062400-348277259f63?w=200" }
-                ]
-            },
-            {
-                day: "Tuesday",
-                options: [
-                    { name: "Pumpkin Bredie", price: 80, desc: "Braised white rice", img: "https://images.unsplash.com/photo-1606101237061-236b3252a122?w=200" },
-                    { name: "Meat Curry", price: 80, desc: "Potatoes & rice", img: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=200" },
-                    { name: "Side: Cucumber Salad", price: 10, desc: "Crisp & cool", img: "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=200" }
-                ]
-            },
-            {
-                day: "Wednesday",
-                options: [
-                    { name: "BBQ Fried Chicken", price: 80, desc: "With Veg Lasagna", img: "https://images.unsplash.com/photo-1626082927389-d10e16738dfc?w=200" },
-                    { name: "Pepper Pot Chicken", price: 80, desc: "With Veg Lasagna", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=200" },
-                    { name: "Side: Couscous", price: 10, desc: "Seasoned", img: "https://images.unsplash.com/photo-1594975545239-0bd9f1681282?w=200" }
-                ]
-            },
-            {
-                day: "Thursday",
-                options: [
-                    { name: "Chicken Alfredo", price: 80, desc: "Creamy pasta", img: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=200" },
-                    { name: "Smoked Butter Chicken", price: 80, desc: "Basmati rice", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=200" },
-                    { name: "Side: Apple & Carrot", price: 10, desc: "Slaw style", img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=200" }
-                ]
-            }
-        ];
-
-        const frozenMenu = [
-            { name: "Low Carb Chicken (5)", price: 450, img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=200" },
-            { name: "Frozen Beef Stew (1kg)", price: 150, img: "https://images.unsplash.com/photo-1603048297172-c92544798d5e?w=200" },
-            { name: "Vegan Lentil Curry", price: 65, img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=200" },
-            { name: "Mac & Cheese (Family)", price: 180, img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200" }
-        ];
-
-        const cateringMenu = [
-            { name: "Lamb Akni", img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=200" },
-            { name: "Roast Leg of Lamb", img: "https://images.unsplash.com/photo-1603048297172-c92544798d5e?w=200" },
-            { name: "Chicken Breyani", img: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200" },
-            { name: "Seafood Paella", img: "https://images.unsplash.com/photo-1534080564583-6be75777b70a?w=200" },
-            { name: "Gourmet Burgers", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200" },
-            { name: "Party Platters", img: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=200" }
-        ];
-
+        // --- APP LOGIC ---
         let cart = [];
-        const currentDay = new Date().getDay(); 
-        // const currentDay = 4; // UNCOMMENT TO SIMULATE THURSDAY
+        let weeklyMenu = [], frozenMenu = [], cateringMenu = [];
 
-        const dailyContainer = document.getElementById('daily');
-        weeklyMenu.forEach((dayPlan, index) => {
-            const dayIndex = index + 1; 
-            const isLocked = currentDay > dayIndex; 
-            const cardClass = isLocked ? "meal-card closed" : "meal-card";
-            const btnIcon = isLocked ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-plus"></i>';
-            const btnClass = isLocked ? "add-btn disabled" : "add-btn";
-            
-            let html = `<h2 class="day-header" style="${isLocked ? 'color:#999':''}">${dayPlan.day}</h2>`;
-            dayPlan.options.forEach((meal, mealIndex) => {
-                const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex})"`;
-                html += `
-                    <div class="${cardClass}">
-                        <img src="${meal.img}" class="meal-thumb">
-                        <div class="meal-info">
-                            <h3>${meal.name}</h3>
-                            <p>${meal.desc}</p>
-                            <span class="meal-price">${isLocked ? 'Sold Out' : 'R ' + meal.price}</span>
-                        </div>
-                        <button class="${btnClass}" ${clickAttr}>${btnIcon}</button>
+        function init() {
+            Papa.parse(MENU_SHEET_URL, {
+                download: true, header: true,
+                complete: function(results) { processData(results.data); }
+            });
+        }
+
+        function processData(data) {
+            weeklyMenu = [
+                { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
+                { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
+            ];
+            frozenMenu = []; cateringMenu = [];
+
+            data.forEach(row => {
+                if(!row.Name) return;
+                if (row.Type === "Daily") {
+                    const dayObj = weeklyMenu.find(d => d.day.includes(row.Day));
+                    if (dayObj) dayObj.options.push({ name: row.Name, price: parseInt(row.Price), desc: row.Desc, img: row.ImageLink });
+                } else if (row.Type === "Frozen") {
+                    frozenMenu.push({ name: row.Name, price: parseInt(row.Price), img: row.ImageLink });
+                } else if (row.Type === "Catering") {
+                    cateringMenu.push({ name: row.Name, img: row.ImageLink });
+                }
+            });
+            renderApp();
+        }
+
+        function renderApp() {
+            const currentDay = new Date().getDay(); 
+            // const currentDay = 4; // UNCOMMENT TO SIMULATE THURSDAY
+
+            // DAILY
+            const dailyContainer = document.getElementById('daily');
+            dailyContainer.innerHTML = "";
+            weeklyMenu.forEach((dayPlan, index) => {
+                const dayIndex = index + 1; 
+                const isLocked = currentDay > dayIndex; 
+                const cardClass = isLocked ? "meal-card closed" : "meal-card";
+                const btnIcon = isLocked ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-plus"></i>';
+                const btnClass = isLocked ? "add-btn disabled" : "add-btn";
+                
+                let html = `<h2 class="day-header" style="${isLocked ? 'color:#999':''}">${dayPlan.day}</h2>`;
+                
+                if (dayPlan.options.length > 0) {
+                    dayPlan.options.forEach((meal, mealIndex) => {
+                        const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex})"`;
+                        html += `
+                            <div class="${cardClass}">
+                                <img src="${meal.img}" class="meal-thumb">
+                                <div class="meal-info">
+                                    <h3>${meal.name}</h3>
+                                    <p>${meal.desc}</p>
+                                    <span class="meal-price">${isLocked ? 'Sold Out' : 'R ' + meal.price}</span>
+                                </div>
+                                <button class="${btnClass}" ${clickAttr}>${btnIcon}</button>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<p style="color:#999; font-style:italic;">Coming soon...</p>`;
+                }
+                dailyContainer.innerHTML += html;
+            });
+
+            // INFO CARD (ONLY ON DAILY)
+            dailyContainer.innerHTML += `
+                <div class="info-card">
+                    <h4><i class="fas fa-clock"></i> Important Info</h4>
+                    <p>Orders close at <strong>10:00 AM daily</strong>.</p>
+                    <p>Call or WhatsApp: <strong>084 299 2881 / 076 878 9492</strong></p>
+                </div>
+            `;
+
+            // FROZEN
+            const frozenContainer = document.getElementById('frozen-list');
+            frozenContainer.innerHTML = "";
+            frozenMenu.forEach((item, index) => {
+                frozenContainer.innerHTML += `
+                    <div class="grid-card">
+                        <img src="${item.img}" alt="${item.name}">
+                        <h4>${item.name}</h4>
+                        <p>R ${item.price}</p>
+                        <button class="grid-btn" onclick="addToCart('frozen', 0, ${index})">Add to Cart</button>
                     </div>
                 `;
             });
-            dailyContainer.innerHTML += html;
-        });
 
-        dailyContainer.innerHTML += `
-            <div class="info-card">
-                <h4><i class="fas fa-clock"></i> Important Info</h4>
-                <p>Orders close at <strong>10:00 AM daily</strong>.</p>
-                <p>Call or WhatsApp:</p>
-                <p style="font-weight:700; color:var(--dark);">084 299 2881 / 076 878 9492</p>
-            </div>
-        `;
+            // CATERING
+            const cateringContainer = document.getElementById('catering-list');
+            cateringContainer.innerHTML = "";
+            cateringMenu.forEach((item, index) => {
+                cateringContainer.innerHTML += `
+                    <div class="grid-card">
+                        <img src="${item.img}" alt="${item.name}">
+                        <h4>${item.name}</h4>
+                        <button class="grid-btn" style="background:var(--dark); color:white; border:none;" onclick="addToCart('catering', 0, ${index})">Get Quote</button>
+                    </div>
+                `;
+            });
+        }
 
-        const frozenContainer = document.getElementById('frozen-list');
-        frozenMenu.forEach((item, index) => {
-            frozenContainer.innerHTML += `
-                <div class="grid-card">
-                    <img src="${item.img}" alt="${item.name}">
-                    <h4>${item.name}</h4>
-                    <p>R ${item.price}</p>
-                    <button class="grid-btn" onclick="addToCart('frozen', 0, ${index})">Add to Cart</button>
-                </div>
-            `;
-        });
-
-        const cateringContainer = document.getElementById('catering-list');
-        cateringMenu.forEach((item, index) => {
-            cateringContainer.innerHTML += `
-                <div class="grid-card">
-                    <img src="${item.img}" alt="${item.name}">
-                    <h4>${item.name}</h4>
-                    <button class="grid-btn" style="background:var(--dark); color:white; border:none;" onclick="addToCart('catering', 0, ${index})">Get Quote</button>
-                </div>
-            `;
-        });
-
-        // --- FUNCTIONS ---
+        // --- CART LOGIC ---
         function switchTab(tabName) {
             document.querySelectorAll('.container').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -476,23 +483,20 @@
             cart.push(item);
             updateTotal();
             const btn = event.target.closest('button');
-            btn.style.transform = "scale(0.8)";
-            setTimeout(() => btn.style.transform = "scale(1)", 200);
+            if(btn) { btn.style.transform = "scale(0.8)"; setTimeout(() => btn.style.transform = "scale(1)", 200); }
         }
 
         function updateTotal() {
             let total = 0;
             let quoteItems = 0;
             cart.forEach(i => { total += i.price; if(i.isQuote) quoteItems++; });
-            
             let displayString = `R ${total}.00`;
             if (quoteItems > 0) displayString += ` + Quote`;
-            
             document.getElementById('total-display').innerText = displayString;
             document.getElementById('cart-count').innerText = cart.length;
         }
 
-        // --- AUTO-FILL from Local Storage ---
+        // --- CHECKOUT ---
         function loadUserData() {
             const savedName = localStorage.getItem('custName');
             const savedAddress = localStorage.getItem('deliveryAddress');
@@ -500,20 +504,12 @@
             if (savedAddress) document.getElementById('deliveryAddress').value = savedAddress;
         }
 
-        function saveUserData() {
-            const name = document.getElementById('custName').value;
-            const address = document.getElementById('deliveryAddress').value;
-            localStorage.setItem('custName', name);
-            localStorage.setItem('deliveryAddress', address);
-        }
-
         function openCheckout() {
             if (cart.length === 0) { alert("Your cart is empty."); return; }
             renderCartInModal();
-            loadUserData(); // Load saved name/address
+            loadUserData();
             document.getElementById('checkoutModal').style.display = "flex";
-            togglePayment(); 
-            toggleFulfillment();
+            togglePayment(); toggleFulfillment();
         }
 
         function closeModal() { document.getElementById('checkoutModal').style.display = "none"; }
@@ -526,10 +522,7 @@
                 total += item.price;
                 container.innerHTML += `
                     <div class="cart-item">
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            <small>${item.isQuote ? 'Quote' : 'R'+item.price}</small>
-                        </div>
+                        <div><strong>${item.name}</strong><br><small>${item.isQuote?'Quote':'R'+item.price}</small></div>
                         <i class="fas fa-trash remove-btn" onclick="removeFromCart(${index})"></i>
                     </div>
                 `;
@@ -549,49 +542,52 @@
             const type = document.getElementById('fulfillmentType').value;
             const delBox = document.getElementById('deliveryBox');
             const colBox = document.getElementById('collectionBox');
-            
-            if (type === 'Delivery') {
-                delBox.style.display = 'block';
-                colBox.style.display = 'none';
-            } else {
-                delBox.style.display = 'none';
-                colBox.style.display = 'block';
-            }
+            if (type === 'Delivery') { delBox.style.display = 'block'; colBox.style.display = 'none'; } 
+            else { delBox.style.display = 'none'; colBox.style.display = 'block'; }
         }
 
         function togglePayment() {
             const type = document.getElementById('paymentMethod').value;
             const eftBox = document.getElementById('eftBox');
             const payfastBox = document.getElementById('payfastBox');
-
-            if (type === 'EFT') {
-                eftBox.style.display = 'block';
-                payfastBox.style.display = 'none';
-            } else if (type === 'Online/Card') {
-                eftBox.style.display = 'none';
-                payfastBox.style.display = 'block';
-            } else {
-                eftBox.style.display = 'none';
-                payfastBox.style.display = 'none';
-            }
+            eftBox.style.display = (type === 'EFT') ? 'block' : 'none';
+            payfastBox.style.display = (type === 'Online/Card') ? 'block' : 'none';
         }
 
         function sendWhatsAppOrder() {
-            saveUserData(); // Save name/address for next time
-            
             const name = document.getElementById('custName').value || "Guest";
             const fulfillment = document.getElementById('fulfillmentType').value;
             const payment = document.getElementById('paymentMethod').value;
             const address = document.getElementById('deliveryAddress').value;
 
-            // Validation
             if (fulfillment === 'Delivery' && address.trim() === '') {
                 alert("Please enter a delivery address.");
                 return;
             }
 
+            localStorage.setItem('custName', name);
+            localStorage.setItem('deliveryAddress', address);
+
+            // 1. Send to Google Sheets
+            let itemString = "";
+            let total = 0;
+            cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
+
+            if (ORDER_SCRIPT_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
+                const formData = new FormData();
+                formData.append("Date", new Date());
+                formData.append("Name", name);
+                formData.append("Phone", PHONE_NUMBER); 
+                formData.append("Method", fulfillment);
+                formData.append("Payment", payment);
+                formData.append("Total", total);
+                formData.append("Items", itemString);
+                formData.append("Address", fulfillment === 'Delivery' ? address : "Collection");
+                fetch(ORDER_SCRIPT_URL, { method: 'POST', body: formData }).catch(e => console.error(e));
+            }
+
+            // 2. WhatsApp
             let msg = `*New Order from ${name}* 🥘%0A%0A`;
-            
             let standardItems = cart.filter(i => !i.isQuote);
             let quoteItems = cart.filter(i => i.isQuote);
 
@@ -604,18 +600,11 @@
                 quoteItems.forEach(item => msg += `• ${item.name.replace('[Bulk Inquiry] ', '')}%0A`);
             }
 
-            let total = 0;
-            cart.forEach(i => total += i.price);
             msg += `%0A*TOTAL: R${total}.00*%0A`;
             msg += `%0A----------------%0A`;
             msg += `📍 *${fulfillment}*%0A`;
-            
-            if (fulfillment === 'Delivery') {
-                msg += `🏠 Addr: ${address}%0A`;
-            } else {
-                msg += `(Customer will collect from Ottery)%0A`;
-            }
-            
+            if (fulfillment === 'Delivery') { msg += `🏠 Addr: ${address}%0A`; } 
+            else { msg += `(Collection from Ottery)%0A`; }
             msg += `💳 *${payment}*%0A`;
             if (payment === "Online/Card") msg += "_(Please confirm if paid via PayFast link)_";
             
@@ -623,9 +612,10 @@
             closeModal();
         }
         
-        window.onclick = function(e) {
-            if (e.target == document.getElementById('checkoutModal')) closeModal();
-        }
+        window.onclick = function(e) { if (e.target == document.getElementById('checkoutModal')) closeModal(); }
+
+        // Start
+        init();
     </script>
 </body>
 </html>
