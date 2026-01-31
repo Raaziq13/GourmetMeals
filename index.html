@@ -49,7 +49,7 @@
             align-items: center; 
         }
         
-        /* NEW LOGO DESIGN */
+        /* LOGO DESIGN */
         .brand-box { display: flex; align-items: center; gap: 10px; }
         .brand-icon { 
             width: 40px; height: 40px; 
@@ -110,7 +110,7 @@
             transform: translateY(-2px);
         }
 
-        /* --- MENU CONTAINERS --- */
+        /* --- CONTAINERS --- */
         .container { max-width: 800px; margin: 0 auto; padding: 0 20px; display: none; animation: fadeIn 0.4s ease; }
         .container.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -255,7 +255,7 @@
     </div>
 
     <div id="daily" class="container active">
-        <div style="text-align:center; padding:40px; color:#999;">Loading Menu...</div>
+        <div style="text-align:center; padding:40px; color:#999; font-style:italic;">Loading Menu...</div>
     </div>
 
     <div id="frozen" class="container">
@@ -299,7 +299,7 @@
             <div id="collectionBox" class="dynamic-info-box">
                 <strong>📍 Collection Point:</strong><br>
                 98 Old Strandfontein Rd,<br>Ottery, Cape Town, 7780<br><br>
-                <a href="https://goo.gl/maps/YOUR_MAP_LINK_HERE" target="_blank" style="color:#d4af37; font-weight:bold;">
+                <a href="https://goo.gl/maps/1" target="_blank" style="color:#d4af37; font-weight:bold;">
                     <i class="fas fa-map-marker-alt"></i> View on Map
                 </a>
             </div>
@@ -323,7 +323,7 @@
 
             <div id="payfastBox" class="dynamic-info-box" style="display:block;">
                 Click below to pay securely via PayFast:<br>
-                <a href="https://www.payfast.co.za/eng/process?cmd=_paynow&receiver=YOUR_MERCHANT_ID" target="_blank" class="pay-btn-link">
+                <a href="#" target="_blank" class="pay-btn-link">
                     Pay Now <i class="fas fa-credit-card"></i>
                 </a>
             </div>
@@ -347,37 +347,52 @@
     <script>
         // const PHONE_NUMBER = "27842992881"; 
         
-        // 1. PASTE YOUR GOOGLE SHEET CSV LINK HERE:
+        // 1. YOUR GOOGLE MENU SHEET
         const MENU_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSdr9Q5N2H5hzkR2a61fy2n0T6uDHeom-twanZI5m-tGvvahTcqw04zY28IbVQARa3fe1gJqqqR2nZz/pub?gid=0&single=true&output=csv";
         
-        // 2. PASTE YOUR APPS SCRIPT URL HERE:
-        const ORDER_SCRIPT_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+        // 2. YOUR ORDER TRACKER SCRIPT
+        const ORDER_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNnQtP6JdpJD3GHwF5gCN4KJAZVRu_kxOzJ2jKg5LkNPZVo0Q1o0Cb2NXFtT-hS0igIQ/exec";
 
-        // --- APP LOGIC ---
+        // --- 1. DATA STORAGE ---
         let cart = [];
-        let weeklyMenu = [], frozenMenu = [], cateringMenu = [];
+        // Default data (Shown while loading)
+        let weeklyMenu = [
+            { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
+            { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
+        ];
+        let frozenMenu = [];
+        let cateringMenu = [];
 
+        // --- 2. INITIALIZATION ---
         function init() {
+            // Fetch data from your Google Sheet
             Papa.parse(MENU_SHEET_URL, {
                 download: true, header: true,
-                complete: function(results) { processData(results.data); }
+                complete: function(results) { processData(results.data); },
+                error: function(err) { console.log("Error loading sheet:", err); }
             });
         }
 
+        // --- 3. PROCESS DATA ---
         function processData(data) {
+            // Reset arrays
             weeklyMenu = [
-                { day: "Monday 2nd Feb", options: [] }, { day: "Tuesday 3rd Feb", options: [] },
-                { day: "Wednesday 4th Feb", options: [] }, { day: "Thursday 5th Feb", options: [] }
+                { day: "Monday", options: [] }, { day: "Tuesday", options: [] },
+                { day: "Wednesday", options: [] }, { day: "Thursday", options: [] }
             ];
             frozenMenu = []; cateringMenu = [];
 
             data.forEach(row => {
                 if(!row.Name) return;
+                
+                // Read price (remove 'R' if present)
+                let price = row.Price ? parseInt(row.Price.toString().replace(/[^0-9]/g, '')) : 0;
+
                 if (row.Type === "Daily") {
                     const dayObj = weeklyMenu.find(d => d.day.includes(row.Day));
-                    if (dayObj) dayObj.options.push({ name: row.Name, price: parseInt(row.Price), desc: row.Desc, img: row.ImageLink });
+                    if (dayObj) dayObj.options.push({ name: row.Name, price: price, desc: row.Desc, img: row.ImageLink });
                 } else if (row.Type === "Frozen") {
-                    frozenMenu.push({ name: row.Name, price: parseInt(row.Price), img: row.ImageLink });
+                    frozenMenu.push({ name: row.Name, price: price, img: row.ImageLink });
                 } else if (row.Type === "Catering") {
                     cateringMenu.push({ name: row.Name, img: row.ImageLink });
                 }
@@ -385,53 +400,76 @@
             renderApp();
         }
 
+        // --- 4. RENDER APP ---
         function renderApp() {
-            const currentDay = new Date().getDay(); 
-            // const currentDay = 4; // UNCOMMENT TO SIMULATE THURSDAY
+            const now = new Date();
+            const currentDay = now.getDay(); // 0=Sun, 1=Mon...
+            const currentHour = now.getHours(); // 0-23
 
-            // DAILY
+            // Helper: Get Date String
+            function getMenuDate(targetDayIndex) {
+                const d = new Date();
+                const day = d.getDay();
+                const diff = d.getDate() - day + (day == 0 ? -6 : 1); // Adjust to Monday
+                const monday = new Date(d.setDate(diff));
+                const targetDate = new Date(monday);
+                targetDate.setDate(monday.getDate() + (targetDayIndex - 1));
+                return targetDate.getDate() + "/" + (targetDate.getMonth() + 1);
+            }
+
+            // RENDER DAILY
             const dailyContainer = document.getElementById('daily');
             dailyContainer.innerHTML = "";
+            
             weeklyMenu.forEach((dayPlan, index) => {
-                const dayIndex = index + 1; 
-                const isLocked = currentDay > dayIndex; 
+                const dayIndex = index + 1; // Mon=1
+                const dateStr = getMenuDate(dayIndex);
+                
+                // Lock Logic
+                let isLocked = false;
+                if (currentDay > dayIndex) { isLocked = true; } // Past day
+                else if (currentDay === dayIndex && currentHour >= 10) { isLocked = true; } // Today > 10am
+                if (currentDay === 0) isLocked = false; // Sunday opens everything
+
                 const cardClass = isLocked ? "meal-card closed" : "meal-card";
                 const btnIcon = isLocked ? '<i class="fas fa-lock"></i>' : '<i class="fas fa-plus"></i>';
                 const btnClass = isLocked ? "add-btn disabled" : "add-btn";
-                
-                let html = `<h2 class="day-header" style="${isLocked ? 'color:#999':''}">${dayPlan.day}</h2>`;
+
+                let html = `<h2 class="day-header" style="${isLocked ? 'color:#bbb':''}">${dayPlan.day} <span style="font-size:0.8rem; opacity:0.6;">${dateStr}</span></h2>`;
                 
                 if (dayPlan.options.length > 0) {
                     dayPlan.options.forEach((meal, mealIndex) => {
                         const clickAttr = isLocked ? "" : `onclick="addToCart('daily', ${index}, ${mealIndex})"`;
+                        const itemPrice = isLocked ? 'Closed' : 'R ' + meal.price;
+                        
                         html += `
                             <div class="${cardClass}">
                                 <img src="${meal.img}" class="meal-thumb">
                                 <div class="meal-info">
                                     <h3>${meal.name}</h3>
                                     <p>${meal.desc}</p>
-                                    <span class="meal-price">${isLocked ? 'Sold Out' : 'R ' + meal.price}</span>
+                                    <span class="meal-price">${itemPrice}</span>
                                 </div>
                                 <button class="${btnClass}" ${clickAttr}>${btnIcon}</button>
                             </div>
                         `;
                     });
                 } else {
-                    html += `<p style="color:#999; font-style:italic;">Coming soon...</p>`;
+                    html += `<div style="padding:15px; color:#888; font-style:italic;">Menu not loaded yet...</div>`;
                 }
                 dailyContainer.innerHTML += html;
             });
 
-            // INFO CARD (ONLY ON DAILY)
+            // INFO CARD
             dailyContainer.innerHTML += `
                 <div class="info-card">
                     <h4><i class="fas fa-clock"></i> Important Info</h4>
                     <p>Orders close at <strong>10:00 AM daily</strong>.</p>
-                    <p>Call or WhatsApp: <strong>084 299 2881 / 076 878 9492</strong></p>
+                    <p>Call or WhatsApp: <strong>084 299 2881</strong></p>
                 </div>
             `;
 
-            // FROZEN
+            // RENDER FROZEN
             const frozenContainer = document.getElementById('frozen-list');
             frozenContainer.innerHTML = "";
             frozenMenu.forEach((item, index) => {
@@ -445,7 +483,7 @@
                 `;
             });
 
-            // CATERING
+            // RENDER CATERING
             const cateringContainer = document.getElementById('catering-list');
             cateringContainer.innerHTML = "";
             cateringMenu.forEach((item, index) => {
@@ -502,6 +540,13 @@
             const savedAddress = localStorage.getItem('deliveryAddress');
             if (savedName) document.getElementById('custName').value = savedName;
             if (savedAddress) document.getElementById('deliveryAddress').value = savedAddress;
+        }
+
+        function saveUserData() {
+            const name = document.getElementById('custName').value;
+            const address = document.getElementById('deliveryAddress').value;
+            localStorage.setItem('custName', name);
+            localStorage.setItem('deliveryAddress', address);
         }
 
         function openCheckout() {
@@ -573,7 +618,7 @@
             let total = 0;
             cart.forEach(i => { itemString += `${i.name}, `; total += i.price; });
 
-            if (ORDER_SCRIPT_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
+            if (ORDER_SCRIPT_URL.includes("script.google.com")) {
                 const formData = new FormData();
                 formData.append("Date", new Date());
                 formData.append("Name", name);
@@ -614,10 +659,8 @@
         
         window.onclick = function(e) { if (e.target == document.getElementById('checkoutModal')) closeModal(); }
 
-        // Start
+        // Start App
         init();
     </script>
 </body>
 </html>
-
-
