@@ -39,9 +39,7 @@
         
         /* DAILY CARDS */
         .meal-card { background: white; border-radius: 8px; padding: 10px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; position: relative; }
-        
-        /* Style for Closed Days */
-        .meal-card.closed { border-left-color: var(--closed); opacity: 0.7; }
+        .meal-card.closed { border-left-color: var(--closed); opacity: 0.6; } /* Grey out closed items */
         
         .meal-thumb { width: 80px; height: 80px; border-radius: 5px; object-fit: cover; background: #eee; flex-shrink: 0; }
         .meal-info { flex: 1; }
@@ -52,9 +50,7 @@
         /* BUTTONS */
         .add-btn { background: var(--dark); color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; white-space: nowrap; }
         .add-btn:active { transform: scale(0.95); }
-        
-        /* Closed Button Style */
-        .add-btn.disabled { background: var(--closed); cursor: not-allowed; transform: none; }
+        .add-btn.disabled { background: var(--closed); cursor: not-allowed; transform: none; } /* Disabled button style */
 
         .catering-btn { background: var(--accent); color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.8rem; width: 100%; margin-top: 5px; }
         
@@ -127,16 +123,15 @@
     <script>
         const PHONE_NUMBER = "27842992881"; 
 
-        // --- TESTING TOOL: SIMULATE A SPECIFIC DAY ---
-        // Options: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
-        // SET THIS TO 'null' WHEN YOU GO LIVE TO USE REAL DATE
-        const SIMULATE_DAY = 4; // Currently set to 4 (Thursday) so you can see Mon-Wed locked.
+        // --- SIMULATE DAY ---
+        // Change this to 'null' when you are ready to go live!
+        // Current: 4 (Thursday) -> Mon/Tue/Wed will be closed.
+        const SIMULATE_DAY = 4; 
 
-        // --- DATA SECTION ---
         const weeklyMenu = [
             {
-                day: "Monday",
-                dayIndex: 1, // Needed for logic
+                day: "Monday 26/1",   /* <--- EDITED HERE */
+                dayIndex: 1, 
                 options: [
                     { name: "Steak Stirfry", price: 80, desc: "Egg noodles & veg", img: "https://images.unsplash.com/photo-1543362906-ac1b48261626?w=150" },
                     { name: "Braised Steak", price: 80, desc: "Savoury veggie rice", img: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=150" },
@@ -144,7 +139,7 @@
                 ]
             },
             {
-                day: "Tuesday",
+                day: "Tuesday 27/1",
                 dayIndex: 2,
                 options: [
                     { name: "Pumpkin Bredie", price: 80, desc: "Braised white rice", img: "https://images.unsplash.com/photo-1606101237061-236b3252a122?w=150" },
@@ -153,7 +148,7 @@
                 ]
             },
             {
-                day: "Wednesday",
+                day: "Wednesday 28/1",
                 dayIndex: 3,
                 options: [
                     { name: "BBQ Fried Chicken", price: 80, desc: "Veg Lasagna", img: "https://images.unsplash.com/photo-1626082927389-d10e16738dfc?w=150" },
@@ -162,7 +157,7 @@
                 ]
             },
             {
-                day: "Thursday",
+                day: "Thursday 29/1",
                 dayIndex: 4,
                 options: [
                     { name: "Chicken Alfredo", price: 80, desc: "Creamy pasta", img: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=150" },
@@ -192,31 +187,19 @@
         let cart = [];
         let hasQuoteRequest = false;
 
-        // Determine "Today" (Uses Simulation if set, otherwise real date)
         const todayIndex = SIMULATE_DAY !== null ? SIMULATE_DAY : new Date().getDay();
 
         const dailyContainer = document.getElementById('daily');
-        
-        // Loop through menu
         weeklyMenu.forEach((dayPlan, dayIndex) => {
-            // LOGIC: If Today(4) > DayIndex(1), then Day 1 is passed.
-            // Exception: If Today is 0 (Sunday) or 6 (Saturday), we probably want everything open for next week? 
-            // For now, simple logic: Past days are closed.
-            
             const isPast = todayIndex > dayPlan.dayIndex; 
-
-            // Create Style Classes
             const cardClass = isPast ? "meal-card closed" : "meal-card";
             const btnClass = isPast ? "add-btn disabled" : "add-btn";
             const btnText = isPast ? "Closed" : "ADD";
             const clickAction = isPast ? "" : `onclick="addToCart('daily', ${dayIndex}, ${mealIndex})"`;
 
             let html = `<h2 class="day-header" style="${isPast ? 'color:gray' : ''}">${dayPlan.day}</h2>`;
-            
             dayPlan.options.forEach((meal, mealIndex) => {
-                // Re-calculate button props for inner loop scope
                 const clickAttr = isPast ? "" : `onclick="addToCart('daily', ${dayIndex}, ${mealIndex})"`;
-                
                 html += `
                     <div class="${cardClass}">
                         <img src="${meal.img}" class="meal-thumb" style="${isPast ? 'filter:grayscale(100%)' : ''}">
