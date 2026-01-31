@@ -128,7 +128,7 @@
             border: 1px solid rgba(0,0,0,0.02);
         }
         .meal-card.closed { opacity: 0.5; filter: grayscale(100%); pointer-events: none; background: #f4f4f4; }
-        .meal-thumb { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; }
+        .meal-thumb { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: #eee; cursor: zoom-in; }
         .meal-info { flex: 1; }
         .meal-info h3 { font-size: 1.1rem; margin-bottom: 4px; color: var(--dark); }
         .meal-info p { font-size: 0.85rem; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
@@ -161,7 +161,7 @@
             text-align: center; box-shadow: var(--shadow); 
             display: flex; flex-direction: column; justify-content: space-between;
         }
-        .grid-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; }
+        .grid-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 12px; margin-bottom: 12px; background: #eee; cursor: zoom-in; }
         .grid-card h4 { font-size: 1rem; margin-bottom: 5px; font-weight: 600; }
         .grid-card p { color: var(--primary-dark); font-weight: 700; margin-bottom: 10px; }
         .grid-card small { font-size: 0.8rem; color: #777; margin-bottom: 8px; display: block; }
@@ -233,6 +233,25 @@
         .confirm-btn { width: 100%; background: var(--dark); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 1rem; }
         .cancel-btn { width: 100%; background: transparent; color: var(--gray); padding: 10px; border: none; font-weight: 600; cursor: pointer; margin-top: 10px; }
 
+        /* --- IMAGE VIEWER (LIGHTBOX) --- */
+        .image-modal {
+            display: none; position: fixed; z-index: 3000; 
+            padding-top: 50px; left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(0,0,0,0.9); 
+            animation: fadeIn 0.3s;
+        }
+        .modal-content-img {
+            margin: auto; display: block; width: 80%; max-width: 700px;
+            border-radius: 10px; box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            animation: zoom 0.3s;
+        }
+        @keyframes zoom { from {transform:scale(0.8); opacity:0} to {transform:scale(1); opacity:1} }
+        .close-img {
+            position: absolute; top: 15px; right: 35px;
+            color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer;
+            z-index: 3001;
+        }
+
     </style>
 </head>
 <body>
@@ -291,6 +310,11 @@
         <div class="grid-layout" id="catering-list"></div>
     </div>
     
+    <div id="imageModal" class="image-modal" onclick="closeImage()">
+        <span class="close-img">&times;</span>
+        <img class="modal-content-img" id="fullImage">
+    </div>
+
     <div id="checkoutModal" class="modal">
         <div class="modal-content">
             <h3>Checkout</h3>
@@ -421,7 +445,6 @@
                 } else if (row.Type === "Frozen") {
                     frozenMenu.push({ name: row.Name, price: price, img: row.ImageLink });
                 } else if (row.Type === "Savouries") {
-                    // NEW SAVOURIES LOGIC
                     savouriesMenu.push({ 
                         name: row.Name, 
                         price: price, 
@@ -433,6 +456,19 @@
                 }
             });
             renderApp();
+        }
+
+        // --- NEW IMAGE VIEWER FUNCTIONS ---
+        function openImage(src) {
+            if(!src || src === "undefined" || src === "") return;
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("fullImage");
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+
+        function closeImage() {
+            document.getElementById("imageModal").style.display = "none";
         }
 
         // RENDER APP
@@ -501,9 +537,10 @@
                             `;
                         }
 
+                        // Added onclick="openImage" to img
                         html += `
                             <div class="${cardClass}">
-                                <img src="${meal.img}" class="meal-thumb">
+                                <img src="${meal.img}" class="meal-thumb" onclick="openImage('${meal.img}')">
                                 <div class="meal-info">
                                     <h3>${meal.name}</h3>
                                     <p>${meal.desc}</p>
@@ -534,7 +571,7 @@
             frozenMenu.forEach((item, index) => {
                 frozenContainer.innerHTML += `
                     <div class="grid-card">
-                        <img src="${item.img}" alt="${item.name}">
+                        <img src="${item.img}" alt="${item.name}" onclick="openImage('${item.img}')">
                         <h4>${item.name}</h4>
                         <p>R ${item.price}</p>
                         <button class="grid-btn" onclick="addToCart('frozen', 0, ${index})">Add to Cart</button>
@@ -542,14 +579,14 @@
                 `;
             });
 
-            // SAVOURIES RENDER (NEW)
+            // SAVOURIES RENDER
             const savouriesContainer = document.getElementById('savouries-list');
             savouriesContainer.innerHTML = "";
             savouriesMenu.forEach((item, index) => {
                 const descHtml = item.desc ? `<small>${item.desc}</small>` : '';
                 savouriesContainer.innerHTML += `
                     <div class="grid-card">
-                        <img src="${item.img}" alt="${item.name}">
+                        <img src="${item.img}" alt="${item.name}" onclick="openImage('${item.img}')">
                         <h4>${item.name}</h4>
                         ${descHtml}
                         <p>R ${item.price}</p>
@@ -564,7 +601,7 @@
             cateringMenu.forEach((item, index) => {
                 cateringContainer.innerHTML += `
                     <div class="grid-card">
-                        <img src="${item.img}" alt="${item.name}">
+                        <img src="${item.img}" alt="${item.name}" onclick="openImage('${item.img}')">
                         <h4>${item.name}</h4>
                         <button class="grid-btn" style="background:var(--dark); color:white; border:none;" onclick="addToCart('catering', 0, ${index})">Get Quote</button>
                     </div>
@@ -601,7 +638,6 @@
                 const meal = frozenMenu[itemIndex];
                 item = { name: `[Frozen] ${meal.name}`, price: meal.price, isQuote: false };
             } else if (type === 'savouries') {
-                // NEW SAVOURIES ADD
                 const meal = savouriesMenu[itemIndex];
                 item = { name: `[Savouries] ${meal.name}`, price: meal.price, isQuote: false };
             } else {
